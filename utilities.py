@@ -9,7 +9,6 @@ from torch import nn
 import torch.optim as optim
 import data_config
 from torch.functional import F
-from matplotlib import pyplot as plt
 
 
 class DatasetType(enum.Enum):
@@ -66,7 +65,7 @@ def get_dataset_constructor(dataset_name):
     return dataset_selector[dataset_name]
 
 
-def get_sample_from_loader(trainloader, device, rbm):
+def get_sample_from_loader(train_loader, device, rbm):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_threshols = torch.zeros(rbm.v.shape).to(device)
     delta_h_threshols = torch.zeros(rbm.h.shape).to(device)
@@ -74,7 +73,7 @@ def get_sample_from_loader(trainloader, device, rbm):
     for epoch in range(config.pretraining_epochs):
         loss = 0.0
         momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(train_loader, 0):
             inputs = data[0].to(device)
             v0, v1, h0, h1 = rbm(inputs)
             delta_weights = delta_weights * momentum + config.pretraining_rate / config.pretraining_batch_size * (
@@ -89,7 +88,7 @@ def get_sample_from_loader(trainloader, device, rbm):
     return losses
 
 
-def get_sample_from_loader_reba(trainloader, device, rbm):
+def get_sample_from_loader_reba(train_loader, device, rbm):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_threshols = torch.zeros(rbm.v.shape).to(device)
     delta_h_threshols = torch.zeros(rbm.h.shape).to(device)
@@ -97,7 +96,7 @@ def get_sample_from_loader_reba(trainloader, device, rbm):
     for epoch in range(config.pretraining_epochs):
         loss = 0.0
         momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(train_loader, 0):
             inputs = data[0].to(device)
             v0, v1, h0, h1 = rbm(inputs)
             der_v = v1 * (1 - v1)
@@ -116,7 +115,7 @@ def get_sample_from_loader_reba(trainloader, device, rbm):
     return losses
 
 
-def get_sample_from_custom_dataset(trainset, device, rbm, batches_count):
+def get_sample_from_custom_dataset(train_set, device, rbm, batches_count):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_threshols = torch.zeros(rbm.v.shape).to(device)
     delta_h_threshols = torch.zeros(rbm.h.shape).to(device)
@@ -126,7 +125,7 @@ def get_sample_from_custom_dataset(trainset, device, rbm, batches_count):
         i = 0
         momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
         while i < batches_count:
-            inputs = trainset[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
+            inputs = train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
             v0, v1, h0, h1 = rbm(inputs)
             delta_weights = delta_weights * momentum + config.pretraining_rate / config.pretraining_batch_size * (
                     torch.mm(v0.T, h0) - torch.mm(v1.T, h1))
@@ -141,7 +140,7 @@ def get_sample_from_custom_dataset(trainset, device, rbm, batches_count):
     return losses
 
 
-def get_sample_from_custom_dataset_reba(trainset, device, rbm, batches_count):
+def get_sample_from_custom_dataset_reba(train_set, device, rbm, batches_count):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_threshols = torch.zeros(rbm.v.shape).to(device)
     delta_h_threshols = torch.zeros(rbm.h.shape).to(device)
@@ -151,7 +150,7 @@ def get_sample_from_custom_dataset_reba(trainset, device, rbm, batches_count):
         i = 0
         momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
         while i < batches_count:
-            inputs = trainset[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
+            inputs = train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
             v0, v1, h0, h1 = rbm(inputs)
             der_v = v1 * (1 - v1)
             der_h = h1 * (1 - h1)
@@ -170,12 +169,12 @@ def get_sample_from_custom_dataset_reba(trainset, device, rbm, batches_count):
     return losses
 
 
-def train_torch_model(model, trainloader, testloader, optimizer, criterion, device):
+def train_torch_model(model, train_loader, test_loader, optimizer, criterion, device):
     best_total_accuracy = 0
     losses = []
     for epoch in range(config.finetuning_epochs):
         running_loss = 0.0
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(train_loader, 0):
             inputs, labels = data[0].to(device), data[1].to(device)
 
             optimizer.zero_grad()
@@ -187,27 +186,27 @@ def train_torch_model(model, trainloader, testloader, optimizer, criterion, devi
 
             running_loss += loss.item()
         if epoch % config.test_every_epochs == 0:
-            current_accuracy = test_torch_model(model, testloader, device)
+            current_accuracy = test_torch_model(model, test_loader, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
         losses.append(running_loss)
     return best_total_accuracy, losses
 
 
-def test_torch_model(model, testloader, device):
+def test_torch_model(model, test_loader, device):
     correct_answers = 0
     with torch.no_grad():
-        for data in testloader:
+        for data in test_loader:
             images, labels = data[0].to(device), data[1].to(device)
             outputs = model(images)
             _, predictions = torch.max(outputs, 1)
             correct_answers += (predictions == labels).sum()
-    return 100 * float(correct_answers) / len(testloader.dataset)
+    return 100 * float(correct_answers) / len(test_loader.dataset)
 
 
-def run_experiment(run, layers, pretrain_type, trainset, trainloader, testloader, device):
+def run_experiment(run, layers, current_experiment_dataset_name, pretrain_type, train_set, train_loader, test_loader, device):
     rbm_stack = RBMStack(layers, device)
-    layers_losses = rbm_stack.train(run, trainset, trainloader, pretrain_type)
+    layers_losses = rbm_stack.train(run, train_set, train_loader, pretrain_type)
 
     classifier = UnifiedClassifier(layers).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
@@ -215,7 +214,10 @@ def run_experiment(run, layers, pretrain_type, trainset, trainloader, testloader
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(classifier.parameters(), lr=0.01, momentum=0.9)
 
-    trainset, testset, trainloader, testloader = data_config.get_torch_dataset(config.current_experiment_dataset_name, config.finetuning_batch_size)
-    best_total_acc, losses = train_torch_model(classifier, trainloader, testloader, optimizer, criterion, device)
+    train_set, test_set, train_loader, test_loader = data_config.get_torch_dataset(
+        current_experiment_dataset_name,
+        config.finetuning_batch_size
+    )
+    best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, device)
 
     return Statistics.get_train_statistics(classifier, layers_losses, best_total_acc), losses

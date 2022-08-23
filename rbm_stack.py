@@ -4,7 +4,6 @@ import config
 from models import RBM
 
 
-
 class RBMStack:
     def __init__(self, layers, device):
         self.rbm_stack = []
@@ -14,35 +13,39 @@ class RBMStack:
             rbm = RBM(self.layers[i], self.layers[i + 1])
             self.rbm_stack.append(rbm.to(self.device))
 
-
-    def train(self, run, trainset, trainloader, pretrain_type):
+    def train(self, run, train_set, train_loader, pretrain_type):
         layers_losses = {}
         with torch.no_grad():
             rbm = self.rbm_stack[0]
             if pretrain_type == utl.PretrainingType.RBMClassic:
-                layers_losses["layer_0"] = utl.get_sample_from_loader(trainloader, self.device, rbm)
+                layers_losses["layer_0"] = utl.get_sample_from_loader(train_loader, self.device, rbm)
             else:
-                layers_losses["layer_0"] = utl.get_sample_from_loader_reba(trainloader, self.device, rbm)
-            new_trainset = torch.zeros((trainset.data.shape[0], self.layers[1]))
-            batches_count = len(new_trainset) / config.pretraining_batch_size
-            for i, data in enumerate(trainloader, 0):
+                layers_losses["layer_0"] = utl.get_sample_from_loader_reba(train_loader, self.device, rbm)
+            new_train_set = torch.zeros((train_set.data.shape[0], self.layers[1]))
+            batches_count = len(new_train_set) / config.pretraining_batch_size
+            for i, data in enumerate(train_loader, 0):
                 inputs, labels = data[0].to(self.device), data[1].to(self.device)
                 v0, v1, h0, h1 = rbm(inputs)
-                new_trainset[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size] = h0
+                new_train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size] = h0
             j = 1
             for rbm, layer in zip(self.rbm_stack[1:-1], self.layers[2:-1]):
                 if pretrain_type == utl.PretrainingType.RBMClassic:
-                    layers_losses["layer_"+str(j)] = utl.get_sample_from_custom_dataset(new_trainset, self.device, rbm, batches_count)
+                    layers_losses["layer_"+str(j)] = utl.get_sample_from_custom_dataset(
+                        new_train_set, self.device, rbm, batches_count
+                    )
                 else:
-                    layers_losses["layer_"+str(j)] = utl.get_sample_from_custom_dataset_reba(new_trainset, self.device, rbm, batches_count)
-                new_trainset_next = torch.zeros((new_trainset.shape[0], layer))
+                    layers_losses["layer_"+str(j)] = utl.get_sample_from_custom_dataset_reba(
+                        new_train_set, self.device, rbm, batches_count
+                    )
+                new_train_set_next = torch.zeros((new_train_set.shape[0], layer))
                 i = 0
                 while i < batches_count:
-                    inputs = new_trainset[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(self.device)
+                    _slice = slice(i * config.pretraining_batch_size, (i + 1) * config.pretraining_batch_size)
+                    inputs = new_train_set[_slice].to(self.device)
                     v0, v1, h0, h1 = rbm(inputs)
-                    new_trainset_next[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size] = h0
+                    new_train_set_next[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size] = h0
                     i += 1
-                new_trainset = new_trainset_next
+                new_train_set = new_train_set_next
                 j += 1
         return layers_losses
 

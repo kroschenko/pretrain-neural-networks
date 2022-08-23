@@ -17,42 +17,42 @@ class UnifiedClassifier(nn.Module):
         return x
 
 
-class Cifar10Classifier(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(3*32*32, 1024)
-        self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, 256)
-        self.fc4 = nn.Linear(256, 128)
-        self.fc5 = nn.Linear(128, 10)
-
-    def forward(self, x):
-        x = torch.flatten(x, 1)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        x = F.relu(self.fc4(x))
-        x = self.fc5(x)
-        return x
-
-
-class MNISTClassifier(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(28*28, 512)
-        self.fc2 = nn.Linear(512, 256)
-        self.fc3 = nn.Linear(256, 128)
-        self.fc4 = nn.Linear(128, 64)
-        self.fc5 = nn.Linear(64, 10)
-
-    def forward(self, x):
-        x = torch.flatten(x, 1)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        x = F.relu(self.fc4(x))
-        x = self.fc5(x)
-        return x
+# class Cifar10Classifier(nn.Module):
+#     def __init__(self):
+#         super().__init__()
+#         self.fc1 = nn.Linear(3*32*32, 1024)
+#         self.fc2 = nn.Linear(1024, 512)
+#         self.fc3 = nn.Linear(512, 256)
+#         self.fc4 = nn.Linear(256, 128)
+#         self.fc5 = nn.Linear(128, 10)
+#
+#     def forward(self, x):
+#         x = torch.flatten(x, 1)
+#         x = F.relu(self.fc1(x))
+#         x = F.relu(self.fc2(x))
+#         x = F.relu(self.fc3(x))
+#         x = F.relu(self.fc4(x))
+#         x = self.fc5(x)
+#         return x
+#
+#
+# class MNISTClassifier(nn.Module):
+#     def __init__(self):
+#         super().__init__()
+#         self.fc1 = nn.Linear(28*28, 512)
+#         self.fc2 = nn.Linear(512, 256)
+#         self.fc3 = nn.Linear(256, 128)
+#         self.fc4 = nn.Linear(128, 64)
+#         self.fc5 = nn.Linear(64, 10)
+#
+#     def forward(self, x):
+#         x = torch.flatten(x, 1)
+#         x = F.relu(self.fc1(x))
+#         x = F.relu(self.fc2(x))
+#         x = F.relu(self.fc3(x))
+#         x = F.relu(self.fc4(x))
+#         x = self.fc5(x)
+#         return x
 
 
 class RBM(nn.Module):
@@ -67,33 +67,13 @@ class RBM(nn.Module):
 
     def visible_to_hidden(self, v):
         output = torch.sigmoid(torch.mm(v, self.W) + self.h)
-        # output = torch.sigmoid(F.linear(v, self.W, self.h))
         return output
 
     def hidden_to_visible(self, h):
         output = torch.sigmoid(torch.mm(h, self.W.t()) + self.v)
-        # output = torch.sigmoid(F.linear(h, self.W.t(), self.v))
         return output
 
-    # def free_energy(self, v):
-    #     r"""Free energy function.
-    #     .. math::
-    #         \begin{align}
-    #             F(x) &= -\log \sum_h \exp (-E(x, h)) \\
-    #             &= -a^\top x - \sum_j \log (1 + \exp(W^{\top}_jx + b_j))\,.
-    #         \end{align}
-    #     Args:
-    #         v (Tensor): The visible variable.
-    #     Returns:
-    #         FloatTensor: The free energy value.
-    #     """
-    #     v_term = torch.matmul(v, self.v.t())
-    #     w_x_h = F.linear(v, self.W, self.h)
-    #     h_term = torch.sum(F.softplus(w_x_h), dim=1)
-    #     return torch.mean(-h_term - v_term)
-
     def forward(self, v0):
-        # v0 = torch.flatten(v0, 1)
         h0 = self.visible_to_hidden(v0)
         h_sampled = h0#1. * (h0 > torch.rand(h0.shape).to('cuda:0'))
         v1 = self.hidden_to_visible(h_sampled)
