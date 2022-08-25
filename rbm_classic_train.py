@@ -22,13 +22,13 @@ def get_experiment_params(_current_experiment_dataset_name: utl.DatasetType):
 @dataclass
 class Conditions:
     layers: list
-    rbm_variant: utl.PretrainingType
+    rbm_pretraining: utl.PretrainingType
     dataset: utl.DatasetType
 
     def __str__(self) -> str:
         return str(self.dataset.name) + '/' + \
                str(self.layers) + '/' + \
-               str(self.rbm_variant.name) + '/'
+               str(self.rbm_pretraining.name) + '/'
 
 
 DATASETS = [utl.DatasetType.MNIST, utl.DatasetType.CIFAR10]
@@ -45,9 +45,8 @@ for dataset in DATASETS:
             for attempt_index in range(0, config.count_attempts_in_experiment):
                 conditions = Conditions(layers, pretraining_type, dataset)
                 torch.random.manual_seed(random_seeds[attempt_index])
-                statistics, losses = utl.run_experiment(run, layers, current_experiment_dataset_name,
-                                                        pretraining_type, train_set, train_loader,
-                                                        test_loader, device)
+                statistics, losses = utl.run_experiment(layers, current_experiment_dataset_name,
+                                                        pretraining_type, train_set, train_loader, device)
                 figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)
                 ax.plot(losses)
