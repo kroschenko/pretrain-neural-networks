@@ -21,6 +21,7 @@ class PretrainingType(enum.Enum):
     RBMClassic = 1
     REBA = 2
 
+
 class Statistics:
 
     def __init__(self):
@@ -63,36 +64,6 @@ def get_dataset_constructor(dataset_type: DatasetType):
         DatasetType.CIFAR100: datasets.CIFAR100
     }
     return dataset_selector[dataset_type]
-
-
-def train_rbm_with_loader(train_loader, device, rbm, pretrain_type):
-    delta_weights = torch.zeros(rbm.W.shape).to(device)
-    delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
-    delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
-    losses = []
-    for epoch in range(config.pretraining_epochs):
-        print(torch.std(rbm.W))
-        loss = 0.0
-        momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
-        for i, data in enumerate(train_loader, 0):
-            inputs = data[0].to(device)
-            v0, v1, h0, h1 = rbm(inputs)
-            if pretrain_type == PretrainingType.RBMClassic:
-                der_v, der_h = 1, 1
-            else:
-                der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
-            part_v = (v1 - v0) * der_v
-            part_h = (h1 - h0) * der_h
-            delta_weights = delta_weights * momentum + config.pretraining_rate_reba / config.pretraining_batch_size * (
-                    torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
-            delta_v_thresholds = delta_v_thresholds * momentum + config.pretraining_rate_reba / config.pretraining_batch_size * part_v.sum(0)
-            delta_h_thresholds = delta_h_thresholds * momentum + config.pretraining_rate_reba / config.pretraining_batch_size * part_h.sum(0)
-            rbm.W -= delta_weights
-            rbm.v -= delta_v_thresholds
-            rbm.h -= delta_h_thresholds
-            loss += ((v1 - v0) ** 2).sum()
-        losses.append(loss.item())
-    return losses
 
 
 def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches_count):
