@@ -21,7 +21,6 @@ class PretrainingType(enum.Enum):
     RBMClassic = 1
     REBA = 2
 
-
 class Statistics:
 
     def __init__(self):
@@ -57,16 +56,16 @@ def get_random_seeds(count):
     return seeds
 
 
-def get_dataset_constructor(dataset_name):
+def get_dataset_constructor(dataset_type: DatasetType):
     dataset_selector = {
         DatasetType.MNIST: datasets.MNIST,
         DatasetType.CIFAR10: datasets.CIFAR10,
         DatasetType.CIFAR100: datasets.CIFAR100
     }
-    return dataset_selector[dataset_name]
+    return dataset_selector[dataset_type]
 
 
-def get_sample_from_loader(train_loader, device, rbm, pretrain_type):
+def train_rbm_with_loader(train_loader, device, rbm, pretrain_type):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
@@ -96,7 +95,7 @@ def get_sample_from_loader(train_loader, device, rbm, pretrain_type):
     return losses
 
 
-def get_sample_from_custom_dataset(train_set, device, rbm, pretrain_type, batches_count):
+def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches_count):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
@@ -165,7 +164,7 @@ def test_torch_model(model, test_loader, device):
     return 100 * float(correct_answers) / len(test_loader.dataset)
 
 
-def run_experiment(layers, current_experiment_dataset_name, pretrain_type, train_set, train_loader, device):
+def run_experiment(layers, pretrain_type, train_set, train_loader, test_loader, device):
     rbm_stack = RBMStack(layers, device)
     layers_losses = rbm_stack.train(train_set, train_loader, pretrain_type)
 
@@ -173,12 +172,12 @@ def run_experiment(layers, current_experiment_dataset_name, pretrain_type, train
     rbm_stack.torch_model_init_from_weights(classifier)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(classifier.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum)
 
-    train_set, test_set, train_loader, test_loader = data_config.get_torch_dataset(
-        current_experiment_dataset_name,
-        config.finetuning_batch_size
-    )
+    # train_set, test_set, train_loader, test_loader = data_config.get_torch_dataset(
+    #     current_experiment_dataset_name,
+    #     config.finetuning_batch_size
+    # )
     best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
