@@ -131,3 +131,4 @@ dmypy.json
 ./data/
 .gitignore
 .neptune
+.idea
