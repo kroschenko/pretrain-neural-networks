@@ -30,7 +30,7 @@ run = neptune.init(
     project="kroschenko/pretrain-networks",
     api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NDM2YWM0Yy1iMGIxLTQwZTctYjMwNy04YWFiY2QxZjgzOWEifQ==",
 )
-DATASETS = [utl.DatasetType.MNIST, utl.DatasetType.CIFAR10]
+DATASETS = [utl.DatasetType.MNIST]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:
     current_experiment_dataset_name = dataset
