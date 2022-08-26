@@ -71,7 +71,11 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
-    for epoch in range(config.pretraining_epochs):
+    epoch = 0
+    stdev_prev = 0
+    stdev = torch.std(rbm.W)
+    while 0.15 > stdev > stdev_prev and epoch < config.pretraining_epochs:
+    # for epoch in range(config.pretraining_epochs):
         print(torch.std(rbm.W))
         loss = 0.0
         i = 0
@@ -97,6 +101,9 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
             loss += ((v1 - v0) ** 2).sum()
             i += 1
         losses.append(loss.item())
+        epoch += 1
+        stdev_prev = stdev
+        stdev = torch.std(rbm.W)
     return losses
 
 

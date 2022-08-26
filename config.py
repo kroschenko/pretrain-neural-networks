@@ -6,9 +6,10 @@ pretraining_batch_size = 128
 momentum_beg = 0.5
 momentum_end = 0.9
 momentum_change_epoch = 5
-pretraining_epochs = 10
+pretraining_epochs = 30
 pretraining_rate = 0.01
 pretraining_rate_reba = 0.04
+pretraining_with_stdev = True
 
 finetune_rate = 0.1
 finetuning_epochs = 10
