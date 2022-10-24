@@ -71,12 +71,7 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
-    epoch = 0
-    stdev_prev = 0
-    stdev = torch.std(rbm.W)
-    while 0.15 > stdev > stdev_prev and epoch < config.pretraining_epochs:
-    # for epoch in range(config.pretraining_epochs):
-        print(torch.std(rbm.W))
+    for epoch in range(config.pretraining_epochs):
         loss = 0.0
         i = 0
         momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
@@ -89,21 +84,19 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
                 der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
-            delta_weights = delta_weights * momentum + config.pretraining_rate_reba / config.pretraining_batch_size * (
+            w_rate = (1. / (1 + (v1 ** 2).sum()) + 1. / (1 + (h1 ** 2)).sum()) / 2
+            delta_weights = delta_weights * momentum + w_rate / config.pretraining_batch_size * (
                     torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
-            delta_v_thresholds = delta_v_thresholds * momentum + config.pretraining_rate_reba / config.pretraining_batch_size * part_v.sum(
-                0)
-            delta_h_thresholds = delta_h_thresholds * momentum + config.pretraining_rate_reba / config.pretraining_batch_size * part_h.sum(
-                0)
+            v_rate = 1. / (1 + (h1 ** 2)).sum()
+            delta_v_thresholds = delta_v_thresholds * momentum + v_rate / config.pretraining_batch_size * part_v.sum(0)
+            h_rate = 1. / (1 + (h1 ** 2)).sum()
+            delta_h_thresholds = delta_h_thresholds * momentum + h_rate / config.pretraining_batch_size * part_h.sum(0)
             rbm.W -= delta_weights
             rbm.v -= delta_v_thresholds
             rbm.h -= delta_h_thresholds
             loss += ((v1 - v0) ** 2).sum()
             i += 1
         losses.append(loss.item())
-        epoch += 1
-        stdev_prev = stdev
-        stdev = torch.std(rbm.W)
     return losses
 
 

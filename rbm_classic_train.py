@@ -38,7 +38,8 @@ for dataset in DATASETS:
                                                                                    config.pretraining_batch_size)
     random_seeds, layers_variants = get_experiment_params(current_experiment_dataset_name)
     conditions = "undefined_"
-    for pretraining_type in utl.PretrainingType:
+    pretraining_types = list(utl.PretrainingType)
+    for pretraining_type in pretraining_types:
         for layers in layers_variants:
             stat = utl.Statistics()
             for attempt_index in range(0, config.count_attempts_in_experiment):
