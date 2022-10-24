@@ -14,7 +14,7 @@ finetune_rate = 0.1
 finetuning_epochs = 10
 finetuning_momentum = 0.9
 test_every_epochs = 5
-count_attempts_in_experiment = 2
+count_attempts_in_experiment = 1
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
