@@ -80,17 +80,19 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
             v0, v1, h0, h1 = rbm(inputs)
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
+                rate = config.pretraining_rate
             else:
                 der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
+                rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
-            w_rate = (1. / (1 + (v1 ** 2).sum()) + 1. / (1 + (h1 ** 2)).sum()) / 2
-            delta_weights = delta_weights * momentum + w_rate / config.pretraining_batch_size * (
+            # w_rate = (1. / (1 + (v1 ** 2).sum()) + 1. / (1 + (h1 ** 2)).sum()) / 2
+            delta_weights = delta_weights * momentum + rate / config.pretraining_batch_size * (
                     torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
-            v_rate = 1. / (1 + (h1 ** 2)).sum()
-            delta_v_thresholds = delta_v_thresholds * momentum + v_rate / config.pretraining_batch_size * part_v.sum(0)
-            h_rate = 1. / (1 + (h1 ** 2)).sum()
-            delta_h_thresholds = delta_h_thresholds * momentum + h_rate / config.pretraining_batch_size * part_h.sum(0)
+            # v_rate = 1. / (1 + (h1 ** 2)).sum()
+            delta_v_thresholds = delta_v_thresholds * momentum + rate / config.pretraining_batch_size * part_v.sum(0)
+            # h_rate = 1. / (1 + (h1 ** 2)).sum()
+            delta_h_thresholds = delta_h_thresholds * momentum + rate / config.pretraining_batch_size * part_h.sum(0)
             rbm.W -= delta_weights
             rbm.v -= delta_v_thresholds
             rbm.h -= delta_h_thresholds
