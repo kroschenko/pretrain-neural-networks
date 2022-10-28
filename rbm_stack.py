@@ -19,7 +19,7 @@ class RBMStack:
         while i < batches_count:
             _slice = slice(i * config.pretraining_batch_size, (i + 1) * config.pretraining_batch_size)
             inputs = train_set[_slice].to(self.device)
-            v0, v1, h0, h1 = rbm(inputs)
+            v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
             new_train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size] = h0
             i += 1
         return new_train_set
