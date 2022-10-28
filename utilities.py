@@ -77,12 +77,14 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
         momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
         while i < batches_count:
             inputs = train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
-            v0, v1, h0, h1 = rbm(inputs)
+            v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
                 rate = config.pretraining_rate
             else:
-                der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
+                # der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
+                der_v = (torch.sigmoid(v1_ws) - torch.sigmoid(v1_ws+0.1)) / 0.1
+                der_h = (torch.sigmoid(h1_ws) - torch.sigmoid(h1_ws+0.1)) / 0.1
                 rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
