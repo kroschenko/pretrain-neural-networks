@@ -71,6 +71,7 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
+    act_func = rbm.a_func
     for epoch in range(config.pretraining_epochs):
         loss = 0.0
         i = 0
@@ -83,8 +84,8 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
                 rate = config.pretraining_rate
             else:
                 # der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
-                der_v = (torch.sigmoid(v1_ws+0.00001) - torch.sigmoid(v1_ws-0.00001)) / 0.00002
-                der_h = (torch.sigmoid(h1_ws+0.00001) - torch.sigmoid(h1_ws-0.00001)) / 0.00002
+                der_v = (act_func(v1_ws+0.00001) - act_func(v1_ws-0.00001)) / 0.00002
+                der_h = (act_func(h1_ws+0.00001) - act_func(h1_ws-0.00001)) / 0.00002
                 rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
