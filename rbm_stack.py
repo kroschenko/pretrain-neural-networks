@@ -5,12 +5,12 @@ from models import RBM
 
 
 class RBMStack:
-    def __init__(self, layers, device):
+    def __init__(self, layers, a_func, device):
         self.rbm_stack = []
         self.layers = layers
         self.device = device
         for i in range(0, len(self.layers) - 1):
-            rbm = RBM(self.layers[i], self.layers[i + 1])
+            rbm = RBM(self.layers[i], self.layers[i + 1], a_func)
             self.rbm_stack.append(rbm.to(self.device))
 
     def _form_dataset_for_next_layer_with_custom_data(self, train_set, layer, batches_count, rbm):

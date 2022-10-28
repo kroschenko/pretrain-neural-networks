@@ -83,8 +83,8 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
                 rate = config.pretraining_rate
             else:
                 # der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
-                der_v = (torch.sigmoid(v1_ws) - torch.sigmoid(v1_ws+0.1)) / 0.1
-                der_h = (torch.sigmoid(h1_ws) - torch.sigmoid(h1_ws+0.1)) / 0.1
+                der_v = (torch.sigmoid(v1_ws+0.00001) - torch.sigmoid(v1_ws-0.00001)) / 0.00002
+                der_h = (torch.sigmoid(h1_ws+0.00001) - torch.sigmoid(h1_ws-0.00001)) / 0.00002
                 rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
@@ -140,7 +140,7 @@ def test_torch_model(model, test_loader, device):
 
 
 def run_experiment(layers, pretrain_type, train_set, train_loader, test_loader, device):
-    rbm_stack = RBMStack(layers, device)
+    rbm_stack = RBMStack(layers, torch.sigmoid, device)
     layers_losses = rbm_stack.train(train_set, train_loader, pretrain_type)
 
     classifier = UnifiedClassifier(layers).to(device)
