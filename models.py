@@ -24,9 +24,9 @@ class RBM(nn.Module):
         # self.h = nn.Parameter(0.02 * torch.rand((1, n_hid)) - 0.01)
         # self.v = nn.Parameter(torch.zeros(1, n_vis))
         # self.h = nn.Parameter(-1 * torch.ones(1, n_hid))
-        self.W = nn.Parameter(0.1 * torch.randn(n_vis, n_hid))
-        self.v = nn.Parameter(0.1 * torch.randn(1, n_vis))
-        self.h = nn.Parameter(0.1 * torch.randn(1, n_hid))
+        self.W = nn.Parameter(torch.randn(n_vis, n_hid))
+        self.v = nn.Parameter(torch.randn(1, n_vis))
+        self.h = nn.Parameter(torch.randn(1, n_hid))
         self.a_func = a_func
 
     def visible_to_hidden(self, v):
