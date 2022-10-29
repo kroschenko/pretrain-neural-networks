@@ -21,7 +21,7 @@ count_attempts_in_experiment = 1
 def get_layers_config_for_dataset(experiment_dataset_name):
     layers_config_selector = {
         utl.DatasetType.MNIST: [
-            {"architecture": [784, 800, 800, 10], "activation": [torch.sigmoid]},
+            {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
             # [784, 1600, 1600, 800, 800, 10]
         ],
         utl.DatasetType.CIFAR10: [
