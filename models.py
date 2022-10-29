@@ -9,7 +9,7 @@ class UnifiedClassifier(nn.Module):
         self.a_functions = []
         layers = layers_config["architecture"]
         if len(layers_config["activation"]) == 1:
-            a_functions = layers_config["activation"] * 3
+            a_functions = layers_config["activation"] * (len(layers) - 1)
         else:
             a_functions = layers_config["activation"]
         for i in range(0, len(layers)-1):
