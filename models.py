@@ -3,15 +3,19 @@ import torch.nn as nn
 
 
 class UnifiedClassifier(nn.Module):
-    def __init__(self, layers):
+    def __init__(self, layers_config):
         super().__init__()
         self.layers = nn.ModuleList()
+        self.a_functions = []
+        layers = layers_config["architecture"]
+        a_functions = layers_config["activation"]
         for i in range(0, len(layers)-1):
             self.layers.append(nn.Linear(layers[i], layers[i+1]))
+            self.a_functions.append(a_functions[i])
 
     def forward(self, x):
         for i in range(0, len(self.layers)-1):
-            x = torch.sigmoid(self.layers[i](x))
+            x = self.a_functions[i]((self.layers[i](x)))
         x = self.layers[len(self.layers)-1](x)
         return x
 

@@ -40,13 +40,13 @@ for dataset in DATASETS:
     conditions = "undefined_"
     pretraining_types = list(utl.PretrainingType)
     for pretraining_type in pretraining_types:
-        for layers in layers_variants:
+        for layers_config in layers_variants:
             stat = utl.Statistics()
             for attempt_index in range(0, config.count_attempts_in_experiment):
-                conditions = Conditions(layers, pretraining_type, dataset)
+                conditions = Conditions(layers_config, pretraining_type, dataset)
                 torch.random.manual_seed(random_seeds[attempt_index])
                 statistics, losses = utl.run_experiment(
-                    layers, pretraining_type, train_set, train_loader, test_loader, device
+                    layers_config, pretraining_type, train_set, train_loader, test_loader, device
                 )
                 figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)
