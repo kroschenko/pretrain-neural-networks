@@ -10,7 +10,7 @@ class RBMStack:
         self.layers = layers_config["architecture"]
         self.device = device
         if len(layers_config["activation"]) == 1:
-            self.a_func = layers_config["activation"] * (len(self.layers) - 2)
+            self.a_func = layers_config["activation"] * (len(self.layers) - 1)
         for i in range(0, len(self.layers) - 1):
             rbm = RBM(self.layers[i], self.layers[i + 1], self.a_func[i])
             self.rbm_stack.append(rbm.to(self.device))
