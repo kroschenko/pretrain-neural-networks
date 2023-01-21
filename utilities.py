@@ -23,6 +23,7 @@ class PretrainingType(enum.Enum):
     REBA = 2
     Without = 3
 
+
 class Statistics:
 
     def __init__(self):
