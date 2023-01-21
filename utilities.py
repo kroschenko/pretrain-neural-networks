@@ -15,12 +15,13 @@ class DatasetType(enum.Enum):
     MNIST = 1
     CIFAR10 = 2
     CIFAR100 = 3
+    IRIS = 4
 
 
 class PretrainingType(enum.Enum):
     RBMClassic = 1
     REBA = 2
-
+    Without = 3
 
 class Statistics:
 
@@ -142,7 +143,9 @@ def test_torch_model(model, test_loader, device):
 
 def run_experiment(layers_config, pretrain_type, train_set, train_loader, test_loader, device):
     rbm_stack = RBMStack(layers_config, device)
-    layers_losses = rbm_stack.train(train_set, train_loader, pretrain_type)
+    layers_losses = None
+    if pretrain_type != PretrainingType.Without:
+        layers_losses = rbm_stack.train(train_set, train_loader, pretrain_type)
 
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
