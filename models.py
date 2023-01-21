@@ -26,9 +26,9 @@ class UnifiedClassifier(nn.Module):
 class RBM(nn.Module):
     def __init__(self, n_vis, n_hid, a_func):
         super(RBM, self).__init__()
-        self.W = nn.Parameter(0.2 * torch.randn(n_vis, n_hid))
-        self.v = nn.Parameter(0.2 * torch.randn(1, n_vis))
-        self.h = nn.Parameter(0.2 * torch.randn(1, n_hid))
+        self.W = nn.Parameter(0.01 * torch.randn(n_vis, n_hid))
+        self.v = nn.Parameter(0.01 * torch.randn(1, n_vis))
+        self.h = nn.Parameter(0.01 * torch.randn(1, n_hid))
         self.a_func = a_func
 
     def visible_to_hidden(self, v):

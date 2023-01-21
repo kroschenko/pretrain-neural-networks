@@ -11,7 +11,7 @@ pretraining_epochs = 10
 pretraining_rate = 0.01
 pretraining_rate_reba = 0.04
 
-finetune_rate = 0.01
+finetune_rate = 0.1
 finetuning_epochs = 10
 finetuning_momentum = 0.9
 test_every_epochs = 5
