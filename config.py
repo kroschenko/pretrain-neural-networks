@@ -25,7 +25,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         # ]
         utl.DatasetType.MNIST: [
             {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
-            [784, 1600, 1600, 800, 800, 10]
+            # [784, 1600, 1600, 800, 800, 10]
         ],
         # utl.DatasetType.CIFAR10: [
         #     [3072, 1024, 512, 256, 128, 64, 10],
