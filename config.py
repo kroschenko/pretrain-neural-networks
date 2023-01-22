@@ -1,5 +1,5 @@
-import utilities as utl
 import torch
+from common_types import DatasetType
 
 max_random_seed = 1024
 
@@ -23,7 +23,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         # utl.DatasetType.IRIS: [
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
-        utl.DatasetType.MNIST: [
+        DatasetType.MNIST: [
             {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
             # [784, 1600, 1600, 800, 800, 10]
         ],

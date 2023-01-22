@@ -3,6 +3,7 @@ import torchvision.transforms as transforms
 import utilities as utl
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
+from common_types import DatasetType
 
 
 class IrisDataset(Dataset):
@@ -43,10 +44,10 @@ transform_CIFAR = transforms.Compose(
 
 def get_torch_dataset(dataset_type, batch_size):
     dataset_selector = {
-        utl.DatasetType.MNIST: transform_MNIST,
-        utl.DatasetType.CIFAR10: transform_CIFAR,
+        DatasetType.MNIST: transform_MNIST,
+        DatasetType.CIFAR10: transform_CIFAR,
     }
-    if dataset_type == utl.DatasetType.IRIS:
+    if dataset_type == DatasetType.IRIS:
         train_set = IrisDataset("./data/fisher_irises/iris_train.txt")  # 120 items
         test_set = IrisDataset("./data/fisher_irises/iris_test.txt")  # 30
         bat_size = batch_size

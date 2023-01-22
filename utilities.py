@@ -9,6 +9,7 @@ from torch import nn
 import torch.optim as optim
 import data_config
 from torch.functional import F
+from common_types import PretrainingType, DatasetType, Statistics
 
 
 def get_random_seeds(count):
