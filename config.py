@@ -1,5 +1,5 @@
 import torch
-from common_types import DatasetType
+from common_types import DatasetType, InitTypes
 
 max_random_seed = 1024
 
@@ -16,6 +16,7 @@ finetuning_epochs = 10
 finetuning_momentum = 0
 test_every_epochs = 5
 count_attempts_in_experiment = 1
+init_type = InitTypes.SimpleUniform
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
