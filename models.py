@@ -26,7 +26,9 @@ class UnifiedClassifier(nn.Module):
 class RBM(nn.Module):
     def __init__(self, n_vis, n_hid, a_func):
         super(RBM, self).__init__()
-        self.W = nn.Parameter(0.01 * torch.randn(n_vis, n_hid))
+        W = 0.01 * torch.randn(n_vis, n_hid)
+        torch.nn.init.kaiming_normal_(W, mode='fan_out')
+        self.W = nn.Parameter(W)
         self.v = nn.Parameter(0.01 * torch.randn(1, n_vis))
         self.h = nn.Parameter(0.01 * torch.randn(1, n_hid))
         self.a_func = a_func
