@@ -13,7 +13,7 @@ pretraining_rate_reba = 0.04
 
 finetune_rate = 0.1
 finetuning_epochs = 10
-finetuning_momentum = 0.9
+finetuning_momentum = 0
 test_every_epochs = 5
 count_attempts_in_experiment = 1
 
