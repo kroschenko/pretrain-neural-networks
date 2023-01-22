@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from common_types import InitTypes
 
 
 class UnifiedClassifier(nn.Module):
@@ -24,13 +25,22 @@ class UnifiedClassifier(nn.Module):
 
 
 class RBM(nn.Module):
-    def __init__(self, n_vis, n_hid, a_func):
+    def __init__(self, n_vis, n_hid, a_func, init_type):
         super(RBM, self).__init__()
-        W = 0.01 * torch.randn(n_vis, n_hid)
-        torch.nn.init.kaiming_normal_(W, mode='fan_out')
-        self.W = nn.Parameter(W)
-        self.v = nn.Parameter(0.01 * torch.randn(1, n_vis))
-        self.h = nn.Parameter(0.01 * torch.randn(1, n_hid))
+        if init_type == InitTypes.Kaiming:
+            W = 0.01 * torch.randn(n_vis, n_hid)
+            torch.nn.init.kaiming_normal_(W, mode='fan_out')
+            self.W = nn.Parameter(W)
+            self.v = nn.Parameter(0.01 * torch.randn(1, n_vis))
+            self.h = nn.Parameter(0.01 * torch.randn(1, n_hid))
+        elif init_type == InitTypes.SimpleNormal:
+            self.W = nn.Parameter(0.01 * torch.randn(n_vis, n_hid))
+            self.v = nn.Parameter(0.01 * torch.randn(1, n_vis))
+            self.h = nn.Parameter(0.01 * torch.randn(1, n_hid))
+        elif init_type == InitTypes.SimpleUniform:
+            self.W = nn.Parameter(0.02 * torch.rand(n_vis, n_hid)-0.01)
+            self.v = nn.Parameter(0.02 * torch.rand(1, n_vis)-0.01)
+            self.h = nn.Parameter(0.02 * torch.rand(1, n_hid)-0.01)
         self.a_func = a_func
 
     def visible_to_hidden(self, v):
