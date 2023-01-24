@@ -44,11 +44,19 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
                 rate = config.pretraining_rate
-            else:
+            elif pretrain_type == PretrainingType.REBA:
                 # der_v, der_h = v1 * (1 - v1), h1 * (1 - h1)
                 der_v = (act_func(v1_ws+0.00001) - act_func(v1_ws-0.00001)) / 0.00002
                 der_h = (act_func(h1_ws+0.00001) - act_func(h1_ws-0.00001)) / 0.00002
                 rate = config.pretraining_rate_reba
+            elif pretrain_type == PretrainingType.Hybrid:
+                if epoch < 7:
+                    der_v, der_h = 1, 1
+                    rate = config.pretraining_rate
+                else:
+                    der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
+                    der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
+                    rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
             # w_rate = (1. / (1 + (v1 ** 2).sum()) + 1. / (1 + (h1 ** 2)).sum()) / 2
@@ -102,8 +110,8 @@ def test_torch_model(model, test_loader, device):
     return 100 * float(correct_answers) / len(test_loader.dataset)
 
 
-def run_experiment(layers_config, pretrain_type, train_set, train_loader, test_loader, device, init_type):
-    rbm_stack = RBMStack(layers_config, device, init_type)
+def run_experiment(layers_config, pretrain_type, train_set, train_loader, test_loader, device, init_type, without_sampling):
+    rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
     if pretrain_type != PretrainingType.Without:
         layers_losses = rbm_stack.train(train_set, train_loader, pretrain_type)

@@ -5,14 +5,14 @@ from models import RBM
 
 
 class RBMStack:
-    def __init__(self, layers_config, device, init_type):
+    def __init__(self, layers_config, device, init_type, without_sampling):
         self.rbm_stack = []
         self.layers = layers_config["architecture"]
         self.device = device
         if len(layers_config["activation"]) == 1:
             self.a_func = layers_config["activation"] * (len(self.layers) - 1)
         for i in range(0, len(self.layers) - 1):
-            rbm = RBM(self.layers[i], self.layers[i + 1], self.a_func[i], init_type)
+            rbm = RBM(self.layers[i], self.layers[i + 1], self.a_func[i], init_type, without_sampling)
             self.rbm_stack.append(rbm.to(self.device))
 
     def _form_dataset_for_next_layer_with_custom_data(self, train_set, layer, batches_count, rbm):

@@ -12,6 +12,7 @@ class PretrainingType(enum.Enum):
     RBMClassic = 1
     REBA = 2
     Without = 3
+    Hybrid = 4
 
 
 class InitTypes(enum.Enum):

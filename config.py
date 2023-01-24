@@ -12,11 +12,14 @@ pretraining_rate = 0.01
 pretraining_rate_reba = 0.04
 
 finetune_rate = 0.1
-finetuning_epochs = 10
-finetuning_momentum = 0
+finetuning_epochs = 90
+finetuning_momentum = 0.9
 test_every_epochs = 5
 count_attempts_in_experiment = 1
-init_type = InitTypes.SimpleUniform
+init_type = InitTypes.Kaiming
+without_sampling = True
+
+m = torch.nn.LeakyReLU(0.01)
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
@@ -25,8 +28,9 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
         DatasetType.MNIST: [
-            {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
-            # [784, 1600, 1600, 800, 800, 10]
+            # {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
+            {"architecture": [784, 1600, 1600, 800, 800, 10], "activation": [torch.relu]},
+            # {"architecture": [[(7, 7), 32], [(5, 5), 16], [(5, 5), 8], 256, 10], "activation": [torch.relu]},
         ],
         # utl.DatasetType.CIFAR10: [
         #     [3072, 1024, 512, 256, 128, 64, 10],
