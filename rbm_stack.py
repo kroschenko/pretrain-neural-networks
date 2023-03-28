@@ -30,7 +30,7 @@ class RBMStack:
             if layer_index == 0:
                 resulted_array[_slice] = inputs
             else:
-                inputs = inputs.to_device(self.device)
+                inputs = inputs.to(self.device)
                 v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = self.rbm_stack[layer_index - 1](inputs)
                 resulted_array[_slice] = h0
             i += 1
