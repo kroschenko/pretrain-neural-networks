@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from dataclasses import dataclass
 from common_types import DatasetType, PretrainingType, Statistics
 
-import neptune.new as neptune
+import neptune
 
 
 def get_experiment_params(_current_experiment_dataset_name: DatasetType):
@@ -28,7 +28,7 @@ class Conditions:
                str(self.rbm_pretraining.name) + '/'
 
 
-run = neptune.init(
+run = neptune.init_run(
     project=ProjectConfig.project_name,
     api_token=ProjectConfig.api_token
 )
