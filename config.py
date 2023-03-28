@@ -20,12 +20,11 @@ pretraining_rate_reba = 0.004 # 0.001
 finetune_rate = 0.1
 finetuning_epochs = 60
 finetuning_momentum = 0.9
-test_every_epochs = 5
+test_every_epochs = 10
 count_attempts_in_experiment = 1
 init_type = InitTypes.Kaiming
 without_sampling = True
 
-# m = torch.nn.LeakyReLU(0.01)
 relu = nn.ReLU()
 sigmoid = nn.Sigmoid()
 softmax = nn.Softmax(dim=1)
