@@ -34,7 +34,9 @@ def _flatten(x):
 
 transform_MNIST = transforms.Compose(
     [transforms.ToTensor(),
-     transforms.Lambda(_flatten)])
+     # transforms.Lambda(_flatten)
+     ]
+)
 
 
 transform_CIFAR = transforms.Compose(
@@ -50,9 +52,8 @@ def get_torch_dataset(dataset_type, batch_size):
     if dataset_type == DatasetType.IRIS:
         train_set = IrisDataset("./data/fisher_irises/iris_train.txt")  # 120 items
         test_set = IrisDataset("./data/fisher_irises/iris_test.txt")  # 30
-        bat_size = batch_size
-        train_loader = DataLoader(train_set, batch_size=bat_size, shuffle=True)
-        test_loader = DataLoader(test_set, batch_size=bat_size, shuffle=True)
+        train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+        test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
     else:
         transform = dataset_selector[dataset_type]
         dataset_con = utl.get_dataset_constructor(dataset_type)
@@ -61,3 +62,12 @@ def get_torch_dataset(dataset_type, batch_size):
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
     return train_set, test_set, train_loader, test_loader
+
+
+def get_tensor_dataset_from_loader(torch_loader):
+    dataset_lst = []
+    i = 0
+    for data, label in torch_loader:
+        dataset_lst.append(data)
+        i += 1
+    return torch.vstack(dataset_lst)
