@@ -10,19 +10,19 @@ class ProjectConfig:
 max_random_seed = 1024
 
 pretraining_batch_size = 64
-momentum_beg = 0.5
-momentum_end = 0.9
+momentum_beg = 0
+momentum_end = 0
 momentum_change_epoch = 5
-pretraining_epochs = 10
-pretraining_rate = 0.001 # 0.001
-pretraining_rate_reba = 0.004 # 0.001
+pretraining_epochs = 20
+pretraining_rate = 0.0005 # 0.001
+pretraining_rate_reba = 0.0005 # 0.001
 
-finetune_rate = 0.1
+finetune_rate = 0.01
 finetuning_epochs = 60
 finetuning_momentum = 0.9
 test_every_epochs = 10
 count_attempts_in_experiment = 1
-init_type = InitTypes.Kaiming
+init_type = InitTypes.SimpleNormal
 without_sampling = True
 
 relu = nn.ReLU()
@@ -46,8 +46,9 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(1, 20, 5), relu, [pooling]],
                 [(20, 40, 5), relu, [pooling, add_postprocessing]],
-                [(640, 100), sigmoid, [dropout]],
-                [(100, 10), softmax],
+                [(640, 1000), relu, [dropout]],
+                [(1000, 1000), relu, [dropout]],
+                [(1000, 10), softmax],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
             # {"architecture": [[1, (28, 28)], [6, (11, 11), (18, 18)], [6, (11, 11), (8, 8)], [6, (8, 8), (1, 1)]], "activation": [torch.sigmoid]}
