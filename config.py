@@ -29,7 +29,7 @@ relu = nn.ReLU()
 sigmoid = nn.Sigmoid()
 softmax = nn.Softmax(dim=1)
 add_postprocessing = nn.Flatten()
-unflatten = nn.Unflatten(1, (20, 12, 12))
+unflatten = nn.Unflatten(1, (20, 6, 6))
 dropout = nn.Dropout(p=0.5)
 pooling = nn.MaxPool2d(kernel_size=2)
 
@@ -53,10 +53,10 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             # ], "input_dim": (1, 28, 28)},
             {"architecture": [
                 [(1, 20, 5), relu, [pooling, add_postprocessing]],
-                [(2880, 2880), relu, [dropout, unflatten]],
+                [(2880, 720), relu, [dropout, unflatten]],
                 [(20, 40, 5), relu, [pooling, add_postprocessing]],
-                [(640, 1000), relu, [dropout]],
-                [(1000, 1000), relu, [dropout]],
+                [(160, 100), relu, [dropout]],
+                [(100, 100), relu, [dropout]],
                 [(1000, 10), softmax],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
