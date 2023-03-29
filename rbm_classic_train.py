@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from dataclasses import dataclass
 from common_types import DatasetType, PretrainingType, Statistics
 
-import neptune
+# import neptune
 
 
 def get_experiment_params(_current_experiment_dataset_name: DatasetType):
@@ -28,10 +28,10 @@ class Conditions:
                str(self.rbm_pretraining.name) + '/'
 
 
-run = neptune.init_run(
-    project=ProjectConfig.project_name,
-    api_token=ProjectConfig.api_token
-)
+# run = neptune.init_run(
+#     project=ProjectConfig.project_name,
+#     api_token=ProjectConfig.api_token
+# )
 
 DATASETS = [DatasetType.MNIST]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -54,9 +54,9 @@ for dataset in DATASETS:
                 figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)
                 ax.plot(losses)
-                run[str(conditions) + str(attempt_index) + "/finetune_loss_evolution"].upload(figure)
+                # run[str(conditions) + str(attempt_index) + "/finetune_loss_evolution"].upload(figure)
                 stat.add(statistics)
             print(stat.get_mean_statistics())
-            run[str(conditions) + "mean_statistics"] = stat.get_mean_statistics()
+            # run[str(conditions) + "mean_statistics"] = stat.get_mean_statistics()
 
-run.stop()
+# run.stop()
