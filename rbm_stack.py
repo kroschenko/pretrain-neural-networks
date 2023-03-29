@@ -47,7 +47,8 @@ class RBMStack:
         layer_index = 0
         with torch.no_grad():
             for rbm, layer in zip(self.rbm_stack, self.layers):
-                layers_losses["layer_"+str(layer_index)], output_shape = utl.train_rbm_with_custom_dataset(
+                # layers_losses["layer_"+str(layer_index)], \
+                output_shape = utl.train_rbm_with_custom_dataset(
                     train_set, self.device, rbm, pretrain_type, batches_count)
                 print(output_shape)
                 layer_index += 1

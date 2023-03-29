@@ -54,7 +54,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(1, 20, 5), relu, [pooling, add_postprocessing]],
                 [(2880, 720), relu, [dropout, unflatten]],
-                [(20, 40, 5), relu, [pooling, add_postprocessing]],
+                [(20, 40, 5), relu, [add_postprocessing]],
                 [(160, 100), relu, [dropout]],
                 [(100, 100), relu, [dropout]],
                 [(1000, 10), softmax],
