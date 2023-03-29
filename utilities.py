@@ -30,8 +30,8 @@ def get_dataset_constructor(dataset_type: DatasetType):
 
 def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches_count):
     train_func = train_rbm if isinstance(rbm, RBM) else train_crbm
-    output_shape = train_func(rbm, device, batches_count, train_set, pretrain_type)
-    return output_shape
+    losses, output_shape = train_func(rbm, device, batches_count, train_set, pretrain_type)
+    return losses, output_shape
 
 
 def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
