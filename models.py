@@ -43,9 +43,9 @@ class RBM(nn.Module):
             self.v = nn.Parameter(v)
             self.h = nn.Parameter(h)
         elif init_type == InitTypes.SimpleNormal:
-            self.W = nn.Parameter(0.001 * torch.randn(n_vis, n_hid))
-            self.v = nn.Parameter(0.001 * torch.randn(1, n_vis))
-            self.h = nn.Parameter(0.001 * torch.randn(1, n_hid))
+            self.W = nn.Parameter(0.01 * torch.randn(n_vis, n_hid))
+            self.v = nn.Parameter(0.01 * torch.randn(1, n_vis))
+            self.h = nn.Parameter(0.01 * torch.randn(1, n_hid))
         elif init_type == InitTypes.SimpleUniform:
             self.W = nn.Parameter(0.02 * torch.rand(n_vis, n_hid)-0.01)
             self.v = nn.Parameter(0.02 * torch.rand(1, n_vis)-0.01)
@@ -92,7 +92,7 @@ class CRBM(nn.Module):
             torch.nn.init.kaiming_normal_(W, nonlinearity="relu")
             self.W = nn.Parameter(W)
         elif init_type == InitTypes.SimpleNormal:
-            self.W = nn.Parameter(0.001 * torch.randn(n_hid_channels, n_vis_channels, kernel_size, kernel_size))
+            self.W = nn.Parameter(0.01 * torch.randn(n_hid_channels, n_vis_channels, kernel_size, kernel_size))
         elif init_type == InitTypes.SimpleUniform:
             self.W = nn.Parameter(0.02 * torch.randn(n_hid_channels, n_vis_channels, kernel_size, kernel_size) - 0.01)
         self.a_func = a_func
