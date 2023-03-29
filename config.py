@@ -57,7 +57,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(20, 40, 5), relu, [add_postprocessing]],
                 [(160, 100), relu, [dropout]],
                 [(100, 100), relu, [dropout]],
-                [(1000, 10), softmax],
+                [(100, 10), softmax],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
             # {"architecture": [[1, (28, 28)], [6, (11, 11), (18, 18)], [6, (11, 11), (8, 8)], [6, (8, 8), (1, 1)]], "activation": [torch.sigmoid]}
