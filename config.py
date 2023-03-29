@@ -29,7 +29,7 @@ relu = nn.ReLU()
 sigmoid = nn.Sigmoid()
 softmax = nn.Softmax(dim=1)
 add_postprocessing = nn.Flatten()
-unflatten = nn.Unflatten(1, (20, 5, 5))
+unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.5)
 pooling = nn.MaxPool2d(kernel_size=2)
 
