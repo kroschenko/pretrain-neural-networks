@@ -37,7 +37,8 @@ class RBMStack:
         if len(self.layers[layer_index-1]) == 3:
             post_processing_actions = self.layers[layer_index-1][2]
             for action in post_processing_actions:
-                resulted_array = action(resulted_array)
+                if not isinstance(action, torch.nn.Dropout):
+                    resulted_array = action(resulted_array)
         return resulted_array
 
     def train(self, train_set, pretrain_type):

@@ -14,8 +14,8 @@ momentum_beg = 0
 momentum_end = 0
 momentum_change_epoch = 5
 pretraining_epochs = 20
-pretraining_rate = 0.0005 # 0.001
-pretraining_rate_reba = 0.0005 # 0.001
+pretraining_rate = 0.0001 # 0.001
+pretraining_rate_reba = 0.0001 # 0.001
 
 finetune_rate = 0.01
 finetuning_epochs = 60
@@ -30,7 +30,7 @@ sigmoid = nn.Sigmoid()
 softmax = nn.Softmax(dim=1)
 add_postprocessing = nn.Flatten()
 unflatten = nn.Unflatten(1, (20, 12, 12))
-dropout = nn.Dropout(p=0.5)
+dropout = nn.Dropout(p=0.2)
 pooling = nn.MaxPool2d(kernel_size=2)
 
 def get_layers_config_for_dataset(experiment_dataset_name):
@@ -39,18 +39,18 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
         DatasetType.MNIST: [
-            {"architecture": [
-                [(784, 800), relu],
-                [(800, 800), relu],
-                [(800, 10), softmax]
-            ], "input_dim": 784},
             # {"architecture": [
-            #     [(1, 20, 5), relu, [pooling]],
-            #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
-            #     [(640, 1000), relu, [dropout]],
-            #     [(1000, 1000), relu, [dropout]],
-            #     [(1000, 10), softmax],
-            # ], "input_dim": (1, 28, 28)},
+                # [(784, 800), sigmoid, [dropout]],
+                # [(800, 800), sigmoid, [dropout]],
+                # [(800, 10), softmax]
+            # ], "input_dim": 784},
+            {"architecture": [
+                [(1, 20, 5), relu, [pooling]],
+                [(20, 40, 5), relu, [pooling, add_postprocessing]],
+                [(640, 1000), relu, [dropout]],
+                [(1000, 1000), relu, [dropout]],
+                [(1000, 10), softmax],
+            ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 20, 5), relu, [pooling]],
             #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
