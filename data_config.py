@@ -34,7 +34,7 @@ def _flatten(x):
 
 transform_MNIST = transforms.Compose(
     [transforms.ToTensor(),
-     # transforms.Lambda(_flatten)
+     transforms.Lambda(_flatten)
      ]
 )
 
