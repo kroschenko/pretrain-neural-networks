@@ -39,18 +39,25 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
         DatasetType.MNIST: [
-            # {"architecture": [
-            #     [(784, 800), a_func],
-            #     [(800, 800), a_func],
-            #     [(800, 10), last_layer_a_func]
-            # ], "input_dim": 784},
             {"architecture": [
-                [(1, 20, 5), relu, [pooling]],
-                [(20, 40, 5), relu, [pooling, add_postprocessing]],
-                [(640, 1000), relu, [dropout]],
-                [(1000, 1000), relu, [dropout]],
-                [(1000, 10), softmax],
-            ], "input_dim": (1, 28, 28)},
+                [(784, 800), relu],
+                [(800, 800), relu],
+                [(800, 10), softmax]
+            ], "input_dim": 784},
+            # {"architecture": [
+            #     [(1, 20, 5), relu, [pooling]],
+            #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
+            #     [(640, 1000), relu, [dropout]],
+            #     [(1000, 1000), relu, [dropout]],
+            #     [(1000, 10), softmax],
+            # ], "input_dim": (1, 28, 28)},
+            # {"architecture": [
+            #     [(1, 20, 5), relu, [pooling]],
+            #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
+            #     [(640, 1000), relu, [dropout]],
+            #     [(1000, 1000), relu, [dropout]],
+            #     [(1000, 10), softmax],
+            # ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 20, 11), relu, [add_postprocessing]],
             #     [(6480, 2880), relu, [dropout, unflatten]],
