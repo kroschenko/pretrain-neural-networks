@@ -10,15 +10,15 @@ class ProjectConfig:
 max_random_seed = 1024
 
 pretraining_batch_size = 64
-momentum_beg = 0
-momentum_end = 0
+momentum_beg = 0.5
+momentum_end = 0.9
 momentum_change_epoch = 5
-pretraining_epochs = 20
-pretraining_rate = 0.0001 # 0.001
-pretraining_rate_reba = 0.0001 # 0.001
+pretraining_epochs = 30
+pretraining_rate = 0.00002 # 0.001
+pretraining_rate_reba = 0.00002 # 0.001
 
-finetune_rate = 0.01
-finetuning_epochs = 60
+finetune_rate = 0.0001
+finetuning_epochs = 100
 finetuning_momentum = 0.9
 test_every_epochs = 10
 count_attempts_in_experiment = 1
@@ -28,6 +28,7 @@ without_sampling = True
 relu = nn.ReLU()
 sigmoid = nn.Sigmoid()
 softmax = nn.Softmax(dim=1)
+logsoftmax = nn.LogSoftmax(dim=1)
 add_postprocessing = nn.Flatten()
 unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.2)
@@ -49,7 +50,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(20, 40, 5), relu, [pooling, add_postprocessing]],
                 [(640, 1000), relu, [dropout]],
                 [(1000, 1000), relu, [dropout]],
-                [(1000, 10), softmax],
+                [(1000, 10), logsoftmax],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 20, 5), relu, [pooling]],

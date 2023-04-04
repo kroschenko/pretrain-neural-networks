@@ -7,7 +7,6 @@ from models import UnifiedClassifier
 from torch import nn
 import torch.optim as optim
 import data_config
-from torch.functional import F
 from common_types import PretrainingType, DatasetType, Statistics
 from models import RBM
 
@@ -135,7 +134,7 @@ def train_torch_model(model, train_loader, test_loader, optimizer, criterion, de
             optimizer.zero_grad()
 
             outputs = model(inputs)
-            loss = criterion(outputs, F.one_hot(labels, num_classes=10).float())
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
@@ -171,8 +170,8 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum)
+    criterion = nn.NLLLoss()
+    optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate)
 
     test_loader = meta_data[3]
     best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, device)
