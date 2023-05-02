@@ -8,6 +8,7 @@ class UnifiedClassifier(nn.Module):
         super().__init__()
         self.layers = nn.ModuleList()
         self.a_functions = []
+        print(layers_config["architecture"])
         self.layers_config = layers_config["architecture"]
         layer_index = 0
         for layer in self.layers_config:

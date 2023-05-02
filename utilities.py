@@ -61,6 +61,10 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
                     der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
                     der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
                     rate = config.pretraining_rate_reba
+            if config.with_adaptive_rate:
+                b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
+                b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
+                rate = (((v0-v1) * b_v).sum() + ((h0-h1) * b_h).sum()) / ((b_h*b_h).sum() + (b_v*b_v).sum())
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
             delta_weights = delta_weights * momentum + rate / config.pretraining_batch_size * (
@@ -166,6 +170,8 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     train_set = data_config.get_tensor_dataset_from_loader(train_loader)
     if pretrain_type != PretrainingType.Without:
         layers_losses = rbm_stack.train(train_set, pretrain_type)
+        if config.with_reduction:
+            rbm_stack.do_reduction(layers_config)
 
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)

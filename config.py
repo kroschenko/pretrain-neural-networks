@@ -1,4 +1,7 @@
 import torch.nn as nn
+# import torch.functional as F
+import torch.nn.functional as F
+from torch.nn.modules.module import Module, Tensor
 from common_types import DatasetType, InitTypes
 from dataclasses import dataclass
 
@@ -7,25 +10,44 @@ class ProjectConfig:
     project_name: str = "kroschenko/pretrain-networks"
     api_token: str = "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NDM2YWM0Yy1iMGIxLTQwZTctYjMwNy04YWFiY2QxZjgzOWEifQ=="
 
-max_random_seed = 1024
+class Linear(Module):
+    __constants__ = ['inplace']
+    inplace: bool
 
+    def __init__(self, inplace: bool = False, constant=1):
+        super(Linear, self).__init__()
+        self.inplace = inplace
+        self.constant = constant
+
+    def forward(self, input: Tensor) -> Tensor:
+        return self.constant * input
+
+    def extra_repr(self) -> str:
+        inplace_str = 'inplace=True' if self.inplace else ''
+        return inplace_str
+
+max_random_seed = 1024
 pretraining_batch_size = 64
 momentum_beg = 0.5
 momentum_end = 0.9
 momentum_change_epoch = 5
 pretraining_epochs = 30
-pretraining_rate = 0.00002 # 0.001
-pretraining_rate_reba = 0.00002 # 0.001
+pretraining_rate = 0.00001#0.00002 # 0.001
+pretraining_rate_reba = 0.00001#0.00002 # 0.001
 
 finetune_rate = 0.0001
-finetuning_epochs = 100
+finetuning_epochs = 50
 finetuning_momentum = 0.9
 test_every_epochs = 10
 count_attempts_in_experiment = 1
 init_type = InitTypes.SimpleNormal
 without_sampling = True
+with_reduction = False
+with_adaptive_rate = True
+reduction_param = 0.01
 
 relu = nn.ReLU()
+linear = Linear()
 sigmoid = nn.Sigmoid()
 softmax = nn.Softmax(dim=1)
 logsoftmax = nn.LogSoftmax(dim=1)
@@ -41,17 +63,24 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         # ]
         DatasetType.MNIST: [
             # {"architecture": [
-                # [(784, 800), sigmoid, [dropout]],
-                # [(800, 800), sigmoid, [dropout]],
-                # [(800, 10), softmax]
+            #     [(784, 800), sigmoid],
+            #     [(800, 800), sigmoid],
+            #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
             {"architecture": [
-                [(1, 20, 5), relu, [pooling]],
-                [(20, 40, 5), relu, [pooling, add_postprocessing]],
-                [(640, 1000), relu, [dropout]],
-                [(1000, 1000), relu, [dropout]],
-                [(1000, 10), logsoftmax],
-            ], "input_dim": (1, 28, 28)},
+                [(784, 1600), sigmoid],
+                [(1600, 1600), sigmoid],
+                [(1600, 800), sigmoid],
+                [(800, 800), sigmoid],
+                [(800, 10), logsoftmax]
+            ], "input_dim": 784},
+            # {"architecture": [
+            #     [(1, 20, 5), relu, [pooling]],
+            #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
+            #     [(640, 1000), relu, [dropout]],
+            #     [(1000, 1000), relu, [dropout]],
+            #     [(1000, 10), logsoftmax],
+            # ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 20, 5), relu, [pooling]],
             #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
