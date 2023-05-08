@@ -32,8 +32,8 @@ momentum_beg = 0.5
 momentum_end = 0.9
 momentum_change_epoch = 5
 pretraining_epochs = 30
-pretraining_rate = 0.00001#0.00002 # 0.001
-pretraining_rate_reba = 0.00001#0.00002 # 0.001
+pretraining_rate = 0.001#0.00002 # 0.001
+pretraining_rate_reba = 0.001#0.00002 # 0.001
 
 finetune_rate = 0.0001
 finetuning_epochs = 50
@@ -43,7 +43,7 @@ count_attempts_in_experiment = 1
 init_type = InitTypes.SimpleNormal
 without_sampling = True
 with_reduction = False
-with_adaptive_rate = True
+with_adaptive_rate = False
 reduction_param = 0.01
 
 relu = nn.ReLU()
@@ -62,18 +62,18 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
         DatasetType.MNIST: [
-            # {"architecture": [
-            #     [(784, 800), sigmoid],
-            #     [(800, 800), sigmoid],
-            #     [(800, 10), logsoftmax]
-            # ], "input_dim": 784},
             {"architecture": [
-                [(784, 1600), sigmoid],
-                [(1600, 1600), sigmoid],
-                [(1600, 800), sigmoid],
+                [(784, 800), sigmoid],
                 [(800, 800), sigmoid],
                 [(800, 10), logsoftmax]
             ], "input_dim": 784},
+            # {"architecture": [
+            #     [(784, 1600), relu],
+            #     [(1600, 1600), relu],
+            #     [(1600, 800), relu],
+            #     [(800, 800), relu],
+            #     [(800, 10), logsoftmax]
+            # ], "input_dim": 784},
             # {"architecture": [
             #     [(1, 20, 5), relu, [pooling]],
             #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
