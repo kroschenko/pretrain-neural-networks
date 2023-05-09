@@ -32,8 +32,8 @@ momentum_beg = 0.5
 momentum_end = 0.5
 momentum_change_epoch = 5
 pretraining_epochs = 10
-pretraining_rate = 0.0001#0.00002 # 0.001
-pretraining_rate_reba = 0.0001#0.00002 # 0.001
+pretraining_rate = 0.000001#0.00002 # 0.001   0.00001 - MNIST
+pretraining_rate_reba = 0.000004#0.00002 # 0.001  0.00004 - MNIST
 
 finetune_rate = 0.00005
 finetuning_epochs = 50
@@ -102,10 +102,16 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             # {"architecture": [784, 1600, 1600, 800, 800, 10], "activation": [torch.relu]},
             # {"architecture": [[(7, 7), 32], [(5, 5), 16], [(5, 5), 8], 256, 10], "activation": [torch.relu]},
         ],
-        # utl.DatasetType.CIFAR10: [
-        #     [3072, 1024, 512, 256, 128, 64, 10],
-        #     [3072, 512, 256, 128, 64, 10]
-        # ],
+        DatasetType.CIFAR10: [
+            {"architecture": [
+                [(3, 32, 5), [sigmoid, relu], [pooling]],
+                [(32, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
+                [(1000, 128), [tanh, relu], [dropout]],
+                [(128, 10), [logsoftmax]],
+            ], "input_dim": (1, 28, 28)},
+            # [3072, 1024, 512, 256, 128, 64, 10],
+            # [3072, 512, 256, 128, 64, 10]
+        ],
         # utl.DatasetType.CIFAR100: [
         #     [3072, 1536, 1024, 512, 256, 100]
         # ]
