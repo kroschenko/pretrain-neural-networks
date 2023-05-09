@@ -29,16 +29,16 @@ class Linear(Module):
 max_random_seed = 1024
 pretraining_batch_size = 64
 momentum_beg = 0.5
-momentum_end = 0.9
+momentum_end = 0.5
 momentum_change_epoch = 5
-pretraining_epochs = 30
-pretraining_rate = 0.001#0.00002 # 0.001
-pretraining_rate_reba = 0.001#0.00002 # 0.001
+pretraining_epochs = 10
+pretraining_rate = 0.0001#0.00002 # 0.001
+pretraining_rate_reba = 0.0001#0.00002 # 0.001
 
-finetune_rate = 0.0001
+finetune_rate = 0.00005
 finetuning_epochs = 50
 finetuning_momentum = 0.9
-test_every_epochs = 10
+test_every_epochs = 1
 count_attempts_in_experiment = 1
 init_type = InitTypes.SimpleNormal
 without_sampling = True
@@ -49,6 +49,7 @@ reduction_param = 0.01
 relu = nn.ReLU()
 linear = Linear()
 sigmoid = nn.Sigmoid()
+tanh = nn.Tanh()
 softmax = nn.Softmax(dim=1)
 logsoftmax = nn.LogSoftmax(dim=1)
 add_postprocessing = nn.Flatten()
@@ -62,11 +63,11 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
         DatasetType.MNIST: [
-            {"architecture": [
-                [(784, 800), sigmoid],
-                [(800, 800), sigmoid],
-                [(800, 10), logsoftmax]
-            ], "input_dim": 784},
+            # {"architecture": [
+            #     [(784, 800), sigmoid],
+            #     [(800, 800), sigmoid],
+            #     [(800, 10), logsoftmax]
+            # ], "input_dim": 784},
             # {"architecture": [
             #     [(784, 1600), relu],
             #     [(1600, 1600), relu],
@@ -74,13 +75,13 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 800), relu],
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
-            # {"architecture": [
-            #     [(1, 20, 5), relu, [pooling]],
-            #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
-            #     [(640, 1000), relu, [dropout]],
-            #     [(1000, 1000), relu, [dropout]],
-            #     [(1000, 10), logsoftmax],
-            # ], "input_dim": (1, 28, 28)},
+            {"architecture": [
+                [(1, 20, 5), [sigmoid, relu], [pooling]],
+                [(20, 40, 5), [relu, tanh], [pooling, add_postprocessing]],
+                [(640, 1000), [tanh, relu], [dropout]],
+                [(1000, 1000), [relu, tanh], [dropout]],
+                [(1000, 10), [logsoftmax]],
+            ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 20, 5), relu, [pooling]],
             #     [(20, 40, 5), relu, [pooling, add_postprocessing]],

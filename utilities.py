@@ -50,17 +50,17 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
                 der_v, der_h = 1, 1
                 rate = config.pretraining_rate
             elif pretrain_type == PretrainingType.REBA:
-                der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
-                der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
+                der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
+                der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
                 rate = config.pretraining_rate_reba
-            elif pretrain_type == PretrainingType.Hybrid:
-                if epoch < 7:
-                    der_v, der_h = 1, 1
-                    rate = config.pretraining_rate
-                else:
-                    der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
-                    der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
-                    rate = config.pretraining_rate_reba
+            # elif pretrain_type == PretrainingType.Hybrid:
+            #     if epoch < 7:
+            #         der_v, der_h = 1, 1
+            #         rate = config.pretraining_rate
+            #     else:
+            #         der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
+            #         der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
+            #         rate = config.pretraining_rate_reba
             if config.with_adaptive_rate:
                 b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
                 b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
@@ -97,17 +97,17 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
                 der_v, der_h = 1, 1
                 rate = config.pretraining_rate
             if pretrain_type == PretrainingType.REBA:
-                der_v = (act_func(v1_ws+0.00001) - act_func(v1_ws-0.00001)) / 0.00002
-                der_h = (act_func(h1_ws+0.00001) - act_func(h1_ws-0.00001)) / 0.00002
+                der_v = (act_func[0](v1_ws+0.00001) - act_func[0](v1_ws-0.00001)) / 0.00002
+                der_h = (act_func[1](h1_ws+0.00001) - act_func[1](h1_ws-0.00001)) / 0.00002
                 rate = config.pretraining_rate_reba
-            if pretrain_type == PretrainingType.Hybrid:
-                if epoch < 7:
-                    der_v, der_h = 1, 1
-                    rate = config.pretraining_rate
-                else:
-                    der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
-                    der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
-                    rate = config.pretraining_rate_reba
+            # if pretrain_type == PretrainingType.Hybrid:
+            #     if epoch < 7:
+            #         der_v, der_h = 1, 1
+            #         rate = config.pretraining_rate
+            #     else:
+            #         der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
+            #         der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
+            #         rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
             first_convolution_part = torch.convolution(
@@ -168,10 +168,10 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     layers_losses = None
     train_loader = meta_data[2]
     train_set = data_config.get_tensor_dataset_from_loader(train_loader)
-    if pretrain_type != PretrainingType.Without:
-        layers_losses = rbm_stack.train(train_set, pretrain_type)
-        if config.with_reduction:
-            rbm_stack.do_reduction(layers_config)
+    # if pretrain_type != PretrainingType.Without:
+    layers_losses = rbm_stack.train(train_set, pretrain_type)
+    if config.with_reduction:
+        rbm_stack.do_reduction(layers_config)
 
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
