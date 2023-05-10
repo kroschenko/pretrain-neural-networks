@@ -33,7 +33,7 @@ class Conditions:
 #     api_token=ProjectConfig.api_token
 # )
 
-DATASETS = [DatasetType.MNIST]
+DATASETS = [DatasetType.CIFAR10]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:
     current_experiment_dataset_name = dataset
