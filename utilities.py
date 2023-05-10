@@ -176,8 +176,10 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
 
-    criterion = nn.NLLLoss()
-    optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate)
+    # criterion = nn.NLLLoss()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum)
+    # optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate)
 
     test_loader = meta_data[3]
     best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, device)
