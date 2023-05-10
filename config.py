@@ -63,11 +63,11 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
         # ]
         DatasetType.MNIST: [
-            # {"architecture": [
-            #     [(784, 800), sigmoid],
-            #     [(800, 800), sigmoid],
-            #     [(800, 10), logsoftmax]
-            # ], "input_dim": 784},
+            {"architecture": [
+                [(784, 800), [sigmoid, sigmoid]],
+                [(800, 800), [sigmoid, sigmoid]],
+                [(800, 10), logsoftmax]
+            ], "input_dim": 784},
             # {"architecture": [
             #     [(784, 1600), relu],
             #     [(1600, 1600), relu],
@@ -75,13 +75,13 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 800), relu],
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
-            {"architecture": [
-                [(1, 20, 5), [sigmoid, relu], [pooling]],
-                [(20, 40, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(640, 1000), [tanh, relu], [dropout]],
-                [(1000, 1000), [relu, tanh], [dropout]],
-                [(1000, 10), [logsoftmax]],
-            ], "input_dim": (1, 28, 28)},
+            # {"architecture": [
+            #     [(1, 20, 5), [sigmoid, relu], [pooling]],
+            #     [(20, 40, 5), [relu, tanh], [pooling, add_postprocessing]],
+            #     [(640, 1000), [tanh, relu], [dropout]],
+            #     [(1000, 1000), [relu, tanh], [dropout]],
+            #     [(1000, 10), [logsoftmax]],
+            # ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 20, 5), relu, [pooling]],
             #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
