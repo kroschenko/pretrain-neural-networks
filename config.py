@@ -66,7 +66,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(784, 800), [sigmoid, sigmoid]],
                 [(800, 800), [sigmoid, sigmoid]],
-                [(800, 10), [softmax]]
+                [(800, 10), [logsoftmax]]
             ], "input_dim": 784},
             # {"architecture": [
             #     [(784, 1600), relu],
