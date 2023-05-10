@@ -168,10 +168,10 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     layers_losses = None
     train_loader = meta_data[2]
     train_set = data_config.get_tensor_dataset_from_loader(train_loader)
-    # if pretrain_type != PretrainingType.Without:
-    layers_losses = rbm_stack.train(train_set, pretrain_type)
-    if config.with_reduction:
-        rbm_stack.do_reduction(layers_config)
+    if pretrain_type != PretrainingType.Without:
+        layers_losses = rbm_stack.train(train_set, pretrain_type)
+        if config.with_reduction:
+            rbm_stack.do_reduction(layers_config)
 
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)

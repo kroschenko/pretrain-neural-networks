@@ -41,13 +41,16 @@ transform_MNIST = transforms.Compose(
 
 transform_CIFAR = transforms.Compose(
     [transforms.ToTensor(),
-     transforms.Lambda(_flatten)])
+     # transforms.Lambda(_flatten)
+     ]
+)
 
 
 def get_torch_dataset(dataset_type, batch_size):
     dataset_selector = {
         DatasetType.MNIST: transform_MNIST,
         DatasetType.CIFAR10: transform_CIFAR,
+        DatasetType.CIFAR100: transform_CIFAR,
     }
     if dataset_type == DatasetType.IRIS:
         train_set = IrisDataset("./data/fisher_irises/iris_train.txt")  # 120 items
