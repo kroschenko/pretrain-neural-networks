@@ -32,10 +32,10 @@ momentum_beg = 0.5
 momentum_end = 0.5
 momentum_change_epoch = 5
 pretraining_epochs = 10
-pretraining_rate = 0.000001#0.00002 # 0.001   0.00001 - MNIST
-pretraining_rate_reba = 0.000004#0.00002 # 0.001  0.00004 - MNIST
+pretraining_rate = 0.01#0.00002 # 0.001   0.00001 - MNIST
+pretraining_rate_reba = 0.04#0.00002 # 0.001  0.00004 - MNIST
 
-finetune_rate = 0.00005
+finetune_rate = 0.01
 finetuning_epochs = 50
 finetuning_momentum = 0.9
 test_every_epochs = 1
@@ -66,7 +66,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(784, 800), [sigmoid, sigmoid]],
                 [(800, 800), [sigmoid, sigmoid]],
-                [(800, 10), logsoftmax]
+                [(800, 10), [logsoftmax]]
             ], "input_dim": 784},
             # {"architecture": [
             #     [(784, 1600), relu],
