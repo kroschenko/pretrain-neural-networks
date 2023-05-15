@@ -26,7 +26,7 @@ class Linear(Module):
         inplace_str = 'inplace=True' if self.inplace else ''
         return inplace_str
 
-max_random_seed = 1024
+max_random_seed = 512
 pretraining_batch_size = 100
 momentum_beg = 0.5
 momentum_end = 0.9
@@ -35,13 +35,13 @@ pretraining_epochs = 10
 pretraining_rate = 0.1#0.00002 # 0.001   0.00001 - MNIST
 pretraining_rate_reba = 0.1#0.00002 # 0.001  0.00004 - MNIST
 
-finetune_rate = 0.1
+finetune_rate = 0.005
 finetuning_epochs = 50
 finetuning_momentum = 0.9
 test_every_epochs = 1
 count_attempts_in_experiment = 1
 init_type = InitTypes.SimpleNormal
-without_sampling = False
+without_sampling = True
 with_reduction = False
 with_adaptive_rate = False
 reduction_param = 0.01
@@ -64,9 +64,13 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         # ]
         DatasetType.MNIST: [
             {"architecture": [
-                [(784, 800), [sigmoid, sigmoid]],
+                [(784, 1600), [sigmoid, sigmoid]],
+                [(1600, 1600), [sigmoid, sigmoid]],
+                [(1600, 800), [sigmoid, sigmoid]],
                 [(800, 800), [sigmoid, sigmoid]],
-                [(800, 10), [sigmoid]]
+                [(800, 800), [sigmoid, sigmoid]],
+                [(800, 800), [sigmoid, sigmoid]],
+                [(800, 10), [linear]]
             ], "input_dim": 784},
             # {"architecture": [
             #     [(784, 1600), relu],

@@ -139,7 +139,7 @@ def train_torch_model(model, train_loader, test_loader, optimizer, criterion, de
             optimizer.zero_grad()
 
             outputs = model(inputs)
-            loss = criterion(outputs, F.one_hot(labels, num_classes=10).float())
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
@@ -168,17 +168,17 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
     train_loader = meta_data[2]
-    # train_set = data_config.get_tensor_dataset_from_loader(train_loader)
-    # if pretrain_type != PretrainingType.Without:
-    #     layers_losses = rbm_stack.train(train_set, pretrain_type)
-    #     if config.with_reduction:
-    #         rbm_stack.do_reduction(layers_config)
+    train_set = data_config.get_tensor_dataset_from_loader(train_loader)
+    if pretrain_type != PretrainingType.Without:
+        layers_losses = rbm_stack.train(train_set, pretrain_type)
+        if config.with_reduction:
+            rbm_stack.do_reduction(layers_config)
 
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
 
     # criterion = nn.NLLLoss()
-    criterion = nn.MSELoss()
+    criterion = nn.CrossEntropyLoss(reduction="sum")
     optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
     # optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate, weight_decay=1e-6)
 
