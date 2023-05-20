@@ -9,9 +9,10 @@ class DatasetType(enum.Enum):
 
 
 class PretrainingType(enum.Enum):
-    REBA = 1
-    RBMClassic = 2
-    Without = 3
+    Hybrid = 1
+    REBA = 2
+    RBMClassic = 3
+    Without = 4
     # Hybrid = 4
 
 

@@ -10,6 +10,7 @@ import data_config
 import torch.nn.functional as F
 from common_types import PretrainingType, DatasetType, Statistics
 from models import RBM
+from torch.optim.lr_scheduler import StepLR
 
 
 def get_random_seeds(count):
@@ -128,7 +129,7 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     return losses, h0.shape
 
 
-def train_torch_model(model, train_loader, test_loader, optimizer, criterion, device):
+def train_torch_model(model, train_loader, test_loader, optimizer, criterion, scheduler, device):
     best_total_accuracy = 0
     losses = []
     for epoch in range(config.finetuning_epochs):
@@ -144,6 +145,7 @@ def train_torch_model(model, train_loader, test_loader, optimizer, criterion, de
             optimizer.step()
 
             running_loss += loss.item()
+        scheduler.step()
         if epoch % config.test_every_epochs == 0:
             current_accuracy = test_torch_model(model, test_loader, device)
             if current_accuracy > best_total_accuracy:
@@ -177,12 +179,12 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
 
-    # criterion = nn.NLLLoss()
-    criterion = nn.CrossEntropyLoss(reduction="sum")
-    optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
-    # optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate, weight_decay=1e-6)
-
+    criterion = nn.NLLLoss()
+    # criterion = nn.CrossEntropyLoss(reduction="sum")
+    # optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
+    optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate, weight_decay=1e-6)
+    scheduler = StepLR(optimizer, 10, 0.5)
     test_loader = meta_data[3]
-    best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, device)
+    best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler, device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
