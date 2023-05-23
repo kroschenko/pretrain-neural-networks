@@ -97,6 +97,8 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
         while i < batches_count:
             inputs = train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
             v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
+            # print()
+            # print(v1.shape())
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
                 rate = config.pretraining_rate
