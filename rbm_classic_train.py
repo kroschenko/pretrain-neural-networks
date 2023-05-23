@@ -1,6 +1,6 @@
 import torch
 import config
-from config import ProjectConfig
+from config import Config
 import data_config
 import utilities as utl
 from matplotlib import pyplot as plt
@@ -11,7 +11,7 @@ from common_types import DatasetType, PretrainingType, Statistics
 
 
 def get_experiment_params(_current_experiment_dataset_name: DatasetType):
-    _random_seeds = utl.get_random_seeds(config.count_attempts_in_experiment)
+    _random_seeds = utl.get_random_seeds(Config.count_attempts_in_experiment)
     _layers_variants = config.get_layers_config_for_dataset(_current_experiment_dataset_name)
     return _random_seeds, _layers_variants
 
@@ -37,7 +37,7 @@ DATASETS = [DatasetType.MNIST]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:
     current_experiment_dataset_name = dataset
-    meta_data = data_config.get_torch_dataset(current_experiment_dataset_name, config.pretraining_batch_size)
+    meta_data = data_config.get_torch_dataset(current_experiment_dataset_name, Config.pretraining_batch_size)
     random_seeds, layers_variants = get_experiment_params(current_experiment_dataset_name)
     conditions = "undefined_"
     pretraining_types = list(PretrainingType)
@@ -45,11 +45,11 @@ for dataset in DATASETS:
         print(pretraining_type)
         for layers_config in layers_variants:
             stat = Statistics()
-            for attempt_index in range(0, config.count_attempts_in_experiment):
+            for attempt_index in range(0, Config.count_attempts_in_experiment):
                 conditions = Conditions(layers_config, pretraining_type, dataset)
                 torch.random.manual_seed(random_seeds[attempt_index])
                 statistics, losses = utl.run_experiment(
-                    layers_config, pretraining_type, meta_data, device, config.init_type, config.without_sampling
+                    layers_config, pretraining_type, meta_data, device, Config.init_type, Config.without_sampling
                 )
                 figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)

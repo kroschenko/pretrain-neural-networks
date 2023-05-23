@@ -13,13 +13,13 @@ class PretrainingType(enum.Enum):
     REBA = 2
     RBMClassic = 3
     Without = 4
-    # Hybrid = 4
 
 
 class InitTypes(enum.Enum):
     SimpleUniform = 1
     SimpleNormal = 2
     Kaiming = 3
+
 
 class Statistics:
 

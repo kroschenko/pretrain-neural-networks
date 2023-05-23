@@ -1,9 +1,10 @@
 import torch
 from torch.nn import functional as F
 from torchvision import datasets, transforms
-from builded_models import convolutionalModelMNIST, linearNetworkMNIST
+from builded_models import linearNetworkMNIST
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
+
 
 def train(model, train_loader, optimizer, epoch):
     model.train()

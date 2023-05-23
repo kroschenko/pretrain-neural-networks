@@ -1,14 +1,14 @@
 import torch.nn as nn
-# import torch.functional as F
-import torch.nn.functional as F
 from torch.nn.modules.module import Module, Tensor
 from common_types import DatasetType, InitTypes
 from dataclasses import dataclass
+
 
 @dataclass
 class ProjectConfig:
     project_name: str = "kroschenko/pretrain-networks"
     api_token: str = "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NDM2YWM0Yy1iMGIxLTQwZTctYjMwNy04YWFiY2QxZjgzOWEifQ=="
+
 
 class Linear(Module):
     __constants__ = ['inplace']
@@ -19,32 +19,36 @@ class Linear(Module):
         self.inplace = inplace
         self.constant = constant
 
-    def forward(self, input: Tensor) -> Tensor:
-        return self.constant * input
+    def forward(self, _input: Tensor) -> Tensor:
+        return self.constant * _input
 
     def extra_repr(self) -> str:
         inplace_str = 'inplace=True' if self.inplace else ''
         return inplace_str
 
-max_random_seed = 123
-pretraining_batch_size = 64
-momentum_beg = 0.5
-momentum_end = 0.9
-momentum_change_epoch = 5
-pretraining_epochs = 30
-pretraining_rate = 0.0001#0.00002 # 0.001   0.00001 - MNIST
-pretraining_rate_reba = 0.0001#0.00002 # 0.001  0.00004 - MNIST
 
-finetune_rate = 0.0001
-finetuning_epochs = 50
-finetuning_momentum = 0.9
-test_every_epochs = 1
-count_attempts_in_experiment = 1
-init_type = InitTypes.SimpleNormal
-without_sampling = True
-with_reduction = False
-with_adaptive_rate = False
-reduction_param = 0.01
+@dataclass
+class Config:
+    max_random_seed = 123
+    pretraining_batch_size = 128
+    momentum_beg = 0.5
+    momentum_end = 0.9
+    momentum_change_epoch = 5
+    pretraining_epochs = 30
+    pretraining_rate = 0.000125  # 0.00002 # 0.001   0.00001 - MNIST
+    pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
+
+    finetune_rate = 0.001
+    finetuning_epochs = 50
+    finetuning_momentum = 0.9
+    test_every_epochs = 1
+    count_attempts_in_experiment = 1
+    init_type = InitTypes.SimpleNormal
+    without_sampling = True
+    with_reduction = False
+    with_adaptive_rate = False
+    reduction_param = 0.01
+
 
 relu = nn.ReLU()
 linear = Linear()
@@ -56,6 +60,7 @@ add_postprocessing = nn.Flatten()
 unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.2)
 pooling = nn.MaxPool2d(kernel_size=2)
+
 
 def get_layers_config_for_dataset(experiment_dataset_name):
     layers_config_selector = {

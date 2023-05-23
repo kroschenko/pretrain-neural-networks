@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import utilities as utl
-import config
+from config import Config
 from models import RBM, CRBM
 from common_types import PretrainingType
 
@@ -45,8 +45,8 @@ class RBMStack:
 
     def train(self, train_set, pretrain_type):
         layers_losses = {}
-        train_set = self._prepare_train_set(train_set, config.pretraining_batch_size, self.input_dim)
-        batches_count = len(train_set) / config.pretraining_batch_size
+        train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, self.input_dim)
+        batches_count = len(train_set) / Config.pretraining_batch_size
         layer_index = 0
         with torch.no_grad():
             for rbm, layer in zip(self.rbm_stack, self.layers):
@@ -60,7 +60,7 @@ class RBMStack:
                     train_set, self.device, rbm, current_pretrain, batches_count)
                 print(output_shape)
                 layer_index += 1
-                train_set = self._prepare_train_set(train_set, config.pretraining_batch_size, output_shape[1:],
+                train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, output_shape[1:],
                                                     layer_index)
         return layers_losses
 
@@ -77,7 +77,7 @@ class RBMStack:
     def do_reduction(self, layers_config):
         with torch.no_grad():
             for i in range(0, len(self.layers) - 1):
-                mask = torch.abs(self.rbm_stack[i].W) > config.reduction_param
+                mask = torch.abs(self.rbm_stack[i].W) > Config.reduction_param
                 # reduction_params_count = (~mask).sum() * 100. / mask.numel()
                 self.rbm_stack[i].W *= mask.double()
             condition = None

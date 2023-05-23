@@ -1,5 +1,5 @@
 import random
-import config
+from config import Config
 import torchvision.datasets as datasets
 import torch
 from rbm_stack import RBMStack
@@ -7,7 +7,6 @@ from models import UnifiedClassifier
 from torch import nn
 import torch.optim as optim
 import data_config
-import torch.nn.functional as F
 from common_types import PretrainingType, DatasetType, Statistics
 from models import RBM
 from torch.optim.lr_scheduler import StepLR
@@ -16,7 +15,7 @@ from torch.optim.lr_scheduler import StepLR
 def get_random_seeds(count):
     seeds = []
     for i in range(0, count):
-        seeds.append(random.randint(0, config.max_random_seed))
+        seeds.append(random.randint(0, Config.max_random_seed))
     return seeds
 
 
@@ -41,20 +40,20 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
     act_func = rbm.a_func
-    for epoch in range(config.pretraining_epochs):
+    for epoch in range(Config.pretraining_epochs):
         loss = 0.
         i = 0
-        momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
+        momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
         while i < batches_count:
-            inputs = train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
+            inputs = train_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
             v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
-                rate = config.pretraining_rate
+                rate = Config.pretraining_rate
             elif pretrain_type == PretrainingType.REBA:
                 der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
                 der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
-                rate = config.pretraining_rate_reba
+                rate = Config.pretraining_rate_reba
             # elif pretrain_type == PretrainingType.Hybrid:
             #     if epoch < 7:
             #         der_v, der_h = 1, 1
@@ -63,16 +62,16 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
             #         der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
             #         der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
             #         rate = config.pretraining_rate_reba
-            if config.with_adaptive_rate:
+            if Config.with_adaptive_rate:
                 b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
                 b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
                 rate = (((v0-v1) * b_v).sum() + ((h0-h1) * b_h).sum()) / ((b_h*b_h).sum() + (b_v*b_v).sum())
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
-            delta_weights = delta_weights * momentum + rate / config.pretraining_batch_size * (
+            delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * (
                     torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
-            delta_v_thresholds = delta_v_thresholds * momentum + rate / config.pretraining_batch_size * part_v.sum(0)
-            delta_h_thresholds = delta_h_thresholds * momentum + rate / config.pretraining_batch_size * part_h.sum(0)
+            delta_v_thresholds = delta_v_thresholds * momentum + rate / Config.pretraining_batch_size * part_v.sum(0)
+            delta_h_thresholds = delta_h_thresholds * momentum + rate / Config.pretraining_batch_size * part_h.sum(0)
             rbm.W -= delta_weights
             rbm.v -= delta_v_thresholds
             rbm.h -= delta_h_thresholds
@@ -90,22 +89,22 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
     act_func = rbm.a_func
-    for epoch in range(config.pretraining_epochs):
+    for epoch in range(Config.pretraining_epochs):
         loss = 0.0
         i = 0
-        momentum = config.momentum_beg if epoch < config.momentum_change_epoch else config.momentum_end
+        momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
         while i < batches_count:
-            inputs = train_set[i * config.pretraining_batch_size:(i + 1) * config.pretraining_batch_size].to(device)
+            inputs = train_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
             v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
             # print()
             # print(v1.shape())
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
-                rate = config.pretraining_rate
+                rate = Config.pretraining_rate
             if pretrain_type == PretrainingType.REBA:
                 der_v = (act_func[0](v1_ws+0.00001) - act_func[0](v1_ws-0.00001)) / 0.00002
                 der_h = (act_func[1](h1_ws+0.00001) - act_func[1](h1_ws-0.00001)) / 0.00002
-                rate = config.pretraining_rate_reba
+                rate = Config.pretraining_rate_reba
             # if pretrain_type == PretrainingType.Hybrid:
             #     if epoch < 7:
             #         der_v, der_h = 1, 1
@@ -125,9 +124,9 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
             common_conv_expr = first_convolution_part + second_convolution_part
 
             # print(part_h.sum((0, 2, 3)).shape)
-            delta_weights = delta_weights * momentum + rate / config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
-            delta_v_thresholds = delta_v_thresholds * momentum + rate / (config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
-            delta_h_thresholds = delta_h_thresholds * momentum + rate / (config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)
+            delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
+            delta_v_thresholds = delta_v_thresholds * momentum + rate / (Config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
+            delta_h_thresholds = delta_h_thresholds * momentum + rate / (Config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)
 
             rbm.W -= delta_weights
             rbm.v -= delta_v_thresholds
@@ -142,7 +141,7 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
 def train_torch_model(model, train_loader, test_loader, optimizer, criterion, scheduler, device):
     best_total_accuracy = 0
     losses = []
-    for epoch in range(config.finetuning_epochs):
+    for epoch in range(Config.finetuning_epochs):
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -156,7 +155,7 @@ def train_torch_model(model, train_loader, test_loader, optimizer, criterion, sc
 
             running_loss += loss.item()
         scheduler.step()
-        if epoch % config.test_every_epochs == 0:
+        if epoch % Config.test_every_epochs == 0:
             current_accuracy = test_torch_model(model, test_loader, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
@@ -183,7 +182,7 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     train_set = data_config.get_tensor_dataset_from_loader(train_loader)
     if pretrain_type != PretrainingType.Without:
         layers_losses = rbm_stack.train(train_set, pretrain_type)
-        if config.with_reduction:
+        if Config.with_reduction:
             rbm_stack.do_reduction(layers_config)
 
     classifier = UnifiedClassifier(layers_config).to(device)
@@ -192,7 +191,7 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     criterion = nn.NLLLoss()
     # criterion = nn.CrossEntropyLoss(reduction="sum")
     # optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
-    optimizer = optim.Adam(classifier.parameters(), lr=config.finetune_rate, weight_decay=1e-6)
+    optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     scheduler = StepLR(optimizer, 10, 0.5)
     test_loader = meta_data[3]
     best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler, device)
