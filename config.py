@@ -31,9 +31,9 @@ pretraining_batch_size = 64
 momentum_beg = 0.5
 momentum_end = 0.9
 momentum_change_epoch = 5
-pretraining_epochs = 30
-pretraining_rate = 0.0001#0.00002 # 0.001   0.00001 - MNIST
-pretraining_rate_reba = 0.0001#0.00002 # 0.001  0.00004 - MNIST
+pretraining_epochs = 10
+pretraining_rate = 0.001#0.00002 # 0.001   0.00001 - MNIST
+pretraining_rate_reba = 0.001#0.00002 # 0.001  0.00004 - MNIST
 
 finetune_rate = 0.0001
 finetuning_epochs = 50

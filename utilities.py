@@ -86,6 +86,8 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
 
 def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
+    delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
+    delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
     act_func = rbm.a_func
     for epoch in range(config.pretraining_epochs):
@@ -120,8 +122,14 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
                 torch.permute(part_h, (1, 0, 2, 3)), None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
             common_conv_expr = first_convolution_part + second_convolution_part
 
+            # print(part_h.sum((0, 2, 3)).shape)
             delta_weights = delta_weights * momentum + rate / config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
+            delta_v_thresholds = delta_v_thresholds * momentum + rate / (config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
+            delta_h_thresholds = delta_h_thresholds * momentum + rate / (config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)
+
             rbm.W -= delta_weights
+            rbm.v -= delta_v_thresholds
+            rbm.h -= delta_h_thresholds
             loss += ((v1 - v0) ** 2).sum()
             i += 1
         print(loss.item())
