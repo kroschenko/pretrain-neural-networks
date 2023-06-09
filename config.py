@@ -29,7 +29,7 @@ class Linear(Module):
 
 @dataclass
 class Config:
-    max_random_seed = 123
+    max_random_seed = 1024
     pretraining_batch_size = 128
     momentum_beg = 0.5
     momentum_end = 0.9
@@ -86,9 +86,9 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             # ], "input_dim": 784},
             {"architecture": [
                 [(1, 40, 5), [sigmoid, relu], [pooling]],
-                [(40, 40, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(640, 320), [tanh, relu]],
-                [(320, 160), [relu, tanh]],
+                [(40, 40, 5), [relu, relu], [pooling, add_postprocessing]],
+                [(640, 320), [relu, relu]],
+                [(320, 160), [relu, relu]],
                 [(160, 10), [logsoftmax]],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [
