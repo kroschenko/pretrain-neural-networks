@@ -1,6 +1,6 @@
 import torch.nn as nn
 from torch.nn.modules.module import Module, Tensor
-from common_types import DatasetType, InitTypes
+from common_types import DatasetType, InitTypes, LayerTrainType
 from dataclasses import dataclass
 
 
@@ -39,7 +39,7 @@ class Config:
     pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
-    finetuning_epochs = 50
+    finetuning_epochs = 25
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -48,6 +48,7 @@ class Config:
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
+    layer_train_type = LayerTrainType.PerLayer
 
 
 relu = nn.ReLU()
@@ -115,7 +116,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 64, 5), [sigmoid, relu], [pooling]],
                 [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu], [dropout]],
+                [(800, 128), [tanh, relu]],
                 [(128, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
             # [3072, 1024, 512, 256, 128, 64, 10],
@@ -125,8 +126,8 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 64, 5), [sigmoid, relu], [pooling]],
                 [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu], [dropout]],
-                [(128, 10), [logsoftmax]],
+                [(800, 128), [tanh, relu]],
+                [(128, 100), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ]
     }

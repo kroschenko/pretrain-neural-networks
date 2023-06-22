@@ -15,6 +15,11 @@ class PretrainingType(enum.Enum):
     Without = 4
 
 
+class LayerTrainType(enum.Enum):
+    PerLayer = 1
+    PerBatch = 2
+
+
 class InitTypes(enum.Enum):
     SimpleUniform = 1
     SimpleNormal = 2

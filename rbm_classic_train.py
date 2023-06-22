@@ -3,7 +3,7 @@ import config
 from config import Config
 import data_config
 import utilities as utl
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from dataclasses import dataclass
 from common_types import DatasetType, PretrainingType, Statistics
 
@@ -33,7 +33,7 @@ class Conditions:
 #     api_token=ProjectConfig.api_token
 # )
 
-DATASETS = [DatasetType.MNIST]
+DATASETS = [DatasetType.CIFAR100]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:
     current_experiment_dataset_name = dataset
@@ -51,9 +51,9 @@ for dataset in DATASETS:
                 statistics, losses = utl.run_experiment(
                     layers_config, pretraining_type, meta_data, device, Config.init_type, Config.without_sampling
                 )
-                figure, ax = plt.subplots(1, 1, figsize=(10, 10))
+                # figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)
-                ax.plot(losses)
+                # ax.plot(losses)
                 # run[str(conditions) + str(attempt_index) + "/finetune_loss_evolution"].upload(figure)
                 stat.add(statistics)
             print(stat.get_mean_statistics())

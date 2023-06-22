@@ -3,7 +3,8 @@ from torch import nn
 import utilities as utl
 from config import Config
 from models import RBM, CRBM
-from common_types import PretrainingType
+from common_types import PretrainingType, LayerTrainType
+from data_config import get_tensor_dataset_from_loader
 
 
 class RBMStack:
@@ -43,25 +44,30 @@ class RBMStack:
                     resulted_array = action(resulted_array)
         return resulted_array
 
-    def train(self, train_set, pretrain_type):
+    def train(self, train_loader, pretrain_type, layer_train_type):
         layers_losses = {}
+        train_set = get_tensor_dataset_from_loader(train_loader)
         train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, self.input_dim)
         batches_count = len(train_set) / Config.pretraining_batch_size
         layer_index = 0
-        with torch.no_grad():
-            for rbm, layer in zip(self.rbm_stack, self.layers):
-                if pretrain_type == PretrainingType.Hybrid:
-                    current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
-                else:
-                    current_pretrain = pretrain_type
-                print(current_pretrain)
-                # layers_losses["layer_"+str(layer_index)], \
-                output_shape = utl.train_rbm_with_custom_dataset(
-                    train_set, self.device, rbm, current_pretrain, batches_count)
-                print(output_shape)
-                layer_index += 1
-                train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, output_shape[1:],
-                                                    layer_index)
+        if layer_train_type == LayerTrainType.PerLayer:
+            with torch.no_grad():
+                for rbm, layer in zip(self.rbm_stack, self.layers):
+                    if pretrain_type == PretrainingType.Hybrid:
+                        current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+                    else:
+                        current_pretrain = pretrain_type
+                    print(current_pretrain)
+                    # layers_losses["layer_"+str(layer_index)], \
+                    output_shape = utl.train_rbm_with_custom_dataset(
+                        train_set, self.device, rbm, current_pretrain, batches_count)
+                    print(output_shape)
+                    layer_index += 1
+                    train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, output_shape[1:],
+                                                        layer_index)
+        if layer_train_type == LayerTrainType.PerBatch:
+            pass
+
         return layers_losses
 
     def torch_model_init_from_weights(self, torch_model):

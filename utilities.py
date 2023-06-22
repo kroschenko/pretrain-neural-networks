@@ -41,6 +41,8 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
     losses = []
     act_func = rbm.a_func
     for epoch in range(Config.pretraining_epochs):
+        rand_indx = torch.randperm(len(train_set))
+        train_set = train_set[rand_indx]
         loss = 0.
         i = 0
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
@@ -90,6 +92,8 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     losses = []
     act_func = rbm.a_func
     for epoch in range(Config.pretraining_epochs):
+        rand_indx = torch.randperm(len(train_set))
+        train_set = train_set[rand_indx]
         loss = 0.0
         i = 0
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
@@ -179,9 +183,8 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
     train_loader = meta_data[2]
-    train_set = data_config.get_tensor_dataset_from_loader(train_loader)
     if pretrain_type != PretrainingType.Without:
-        layers_losses = rbm_stack.train(train_set, pretrain_type)
+        layers_losses = rbm_stack.train(train_loader, pretrain_type, layer_train_type=Config.layer_train_type)
         if Config.with_reduction:
             rbm_stack.do_reduction(layers_config)
 
@@ -192,7 +195,7 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     # criterion = nn.CrossEntropyLoss(reduction="sum")
     # optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
     optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
-    scheduler = StepLR(optimizer, 10, 0.5)
+    scheduler = StepLR(optimizer, 5, 0.5)
     test_loader = meta_data[3]
     best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler, device)
 
