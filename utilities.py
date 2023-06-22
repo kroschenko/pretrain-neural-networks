@@ -1,13 +1,11 @@
 import random
 from config import Config
-import torchvision.datasets as datasets
 import torch
 from rbm_stack import RBMStack
 from models import UnifiedClassifier
 from torch import nn
 import torch.optim as optim
-import data_config
-from common_types import PretrainingType, DatasetType, Statistics
+from common_types import PretrainingType, Statistics
 from models import RBM
 from torch.optim.lr_scheduler import StepLR
 
@@ -17,15 +15,6 @@ def get_random_seeds(count):
     for i in range(0, count):
         seeds.append(random.randint(0, Config.max_random_seed))
     return seeds
-
-
-def get_dataset_constructor(dataset_type: DatasetType):
-    dataset_selector = {
-        DatasetType.MNIST: datasets.MNIST,
-        DatasetType.CIFAR10: datasets.CIFAR10,
-        DatasetType.CIFAR100: datasets.CIFAR100
-    }
-    return dataset_selector[dataset_type]
 
 
 def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches_count):
