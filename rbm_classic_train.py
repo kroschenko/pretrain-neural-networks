@@ -50,7 +50,7 @@ for dataset in DATASETS:
                 conditions = Conditions(layers_config, pretraining_type, dataset)
                 torch.random.manual_seed(random_seeds[attempt_index])
                 statistics, losses = utl.run_experiment(
-                    layers_config, pretraining_type, meta_data, device, Config.init_type, Config.without_sampling
+                    layers_config, pretraining_type, meta_data, device, Config.init_type, Config.without_sampling, Config.k
                 )
                 # figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)

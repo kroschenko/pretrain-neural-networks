@@ -31,7 +31,7 @@ class UnifiedClassifier(nn.Module):
 
 
 class RBM(nn.Module):
-    def __init__(self, n_vis, n_hid, a_func, init_type, without_sampling):
+    def __init__(self, n_vis, n_hid, a_func, init_type, without_sampling, k):
         super(RBM, self).__init__()
         if init_type == InitTypes.Kaiming:
             W = torch.empty(n_vis, n_hid)
@@ -53,6 +53,7 @@ class RBM(nn.Module):
             self.h = nn.Parameter(0.02 * torch.rand(1, n_hid)-0.01)
         self.a_func = a_func
         self.without_sampling = without_sampling
+        self.k = k
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.mm(v, self.W) + self.h
@@ -65,18 +66,23 @@ class RBM(nn.Module):
         return output, weighted_sum
 
     def forward(self, v0):
-        h0, h0_ws = self.visible_to_hidden(v0)
-        if self.without_sampling:
-            h_sampled = h0
-        else:
-            if self.a_func[1] == torch.sigmoid:
-                h_sampled = 1. * (h0 > torch.rand(h0.shape))
-            elif self.a_func[1] == torch.relu:
-                h0_std = torch.std(h0, dim=0, unbiased=False)
-                h_sampled = h0 + torch.normal(0, h0_std)
-            else:
+        v1 = v0
+        step = 0
+        while step < self.k:
+            v0 = v1
+            h0, h0_ws = self.visible_to_hidden(v0)
+            if self.without_sampling:
                 h_sampled = h0
-        v1, v1_ws = self.hidden_to_visible(h_sampled)
+            else:
+                if self.a_func[1] == torch.sigmoid:
+                    h_sampled = 1. * (h0 > torch.rand(h0.shape))
+                elif self.a_func[1] == torch.relu:
+                    h0_std = torch.std(h0, dim=0, unbiased=False)
+                    h_sampled = h0 + torch.normal(0, h0_std)
+                else:
+                    h_sampled = h0
+            v1, v1_ws = self.hidden_to_visible(h_sampled)
+            step += 1
         h1, h1_ws = self.visible_to_hidden(v1)
         return v0, v1, v1_ws, h0, h0_ws, h1, h1_ws
 
@@ -86,7 +92,7 @@ class RBM(nn.Module):
 
 
 class CRBM(nn.Module):
-    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, without_sampling):
+    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, without_sampling, k):
         super(CRBM, self).__init__()
         if init_type == InitTypes.Kaiming:
             W = torch.empty(n_hid_channels, n_vis_channels, kernel_size, kernel_size)
@@ -102,6 +108,7 @@ class CRBM(nn.Module):
             self.h = nn.Parameter(0.02 * torch.rand(1, n_hid_channels, 1, 1) - 0.01)
         self.a_func = a_func
         self.without_sampling = without_sampling
+        self.k = k
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.convolution(v, self.W, None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
@@ -115,18 +122,23 @@ class CRBM(nn.Module):
         return output, weighted_sum
 
     def forward(self, v0):
-        h0, h0_ws = self.visible_to_hidden(v0)
-        if self.without_sampling:
-            h_sampled = h0
-        else:
-            if self.a_func[1] == torch.sigmoid:
-                h_sampled = 1. * (h0 > torch.rand(h0.shape))
-            elif self.a_func[1] == torch.relu:
-                h0_std = torch.std(h0, dim=0, unbiased=False)
-                h_sampled = h0 + torch.normal(0, h0_std)
-            else:
+        v1 = v0
+        step = 0
+        while step < self.k:
+            v0 = v1
+            h0, h0_ws = self.visible_to_hidden(v0)
+            if self.without_sampling:
                 h_sampled = h0
-        v1, v1_ws = self.hidden_to_visible(h_sampled)
+            else:
+                if self.a_func[1] == torch.sigmoid:
+                    h_sampled = 1. * (h0 > torch.rand(h0.shape))
+                elif self.a_func[1] == torch.relu:
+                    h0_std = torch.std(h0, dim=0, unbiased=False)
+                    h_sampled = h0 + torch.normal(0, h0_std)
+                else:
+                    h_sampled = h0
+            v1, v1_ws = self.hidden_to_visible(h_sampled)
+            step += 1
         h1, h1_ws = self.visible_to_hidden(v1)
         return v0, v1, v1_ws, h0, h0_ws, h1, h1_ws
 

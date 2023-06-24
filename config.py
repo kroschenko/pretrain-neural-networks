@@ -49,6 +49,7 @@ class Config:
     with_adaptive_rate = False
     reduction_param = 0.01
     layer_train_type = LayerTrainType.PerLayer
+    k = 1
 
 
 relu = nn.ReLU()
@@ -85,7 +86,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 64, 5), [sigmoid, relu], [pooling]],
                 [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu], [dropout]],
+                [(800, 128), [tanh, relu]],
                 [(128, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
@@ -93,7 +94,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 64, 5), [sigmoid, relu], [pooling]],
                 [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu], [dropout]],
+                [(800, 128), [tanh, relu]],
                 [(128, 100), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ]

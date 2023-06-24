@@ -149,8 +149,8 @@ def test_torch_model(model, test_loader, device):
     return 100 * float(correct_answers) / len(test_loader.dataset)
 
 
-def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, without_sampling):
-    rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
+def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, without_sampling, k):
+    rbm_stack = RBMStack(layers_config, device, init_type, without_sampling, k)
     layers_losses = None
     train_loader = meta_data[2]
     if pretrain_type != PretrainingType.Without:

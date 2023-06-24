@@ -8,7 +8,7 @@ from data_config import get_tensor_dataset_from_loader
 
 
 class RBMStack:
-    def __init__(self, layers_config, device, init_type, without_sampling):
+    def __init__(self, layers_config, device, init_type, without_sampling, k):
         self.rbm_stack = []
         self.layers = layers_config["architecture"]
         self.input_dim = layers_config["input_dim"]
@@ -17,7 +17,7 @@ class RBMStack:
             layer_params = self.layers[i][0]
             layer_activation_function = self.layers[i][1]
             rbm_constructor = RBM if len(layer_params) == 2 else CRBM
-            rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, without_sampling)
+            rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, without_sampling, k)
             self.rbm_stack.append(rbm.to(self.device))
 
     def _prepare_train_set(self, train_set, batch_size, input_dim, layer_index=0):
