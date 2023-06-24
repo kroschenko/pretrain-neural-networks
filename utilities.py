@@ -23,12 +23,98 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
     return output_shape
 
 
+def train_rbm_with_batch(rbm, batch, pretrain_type):
+    train_func = batch_train_rbm if isinstance(rbm, RBM) else batch_train_crbm
+    losses, _ = train_func(rbm, batch, pretrain_type)
+
+
+def batch_train_rbm(rbm, batch, pretrain_type, delta_weights=None, delta_v_thresholds=None, delta_h_thresholds=None,
+                    momentum=0):
+    act_func = rbm.a_func
+    v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(batch)
+    if pretrain_type == PretrainingType.RBMClassic:
+        der_v, der_h = 1, 1
+        rate = Config.pretraining_rate
+    elif pretrain_type == PretrainingType.REBA:
+        der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
+        der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
+        rate = Config.pretraining_rate_reba
+    if Config.with_adaptive_rate:
+        b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
+        b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
+        rate = (((v0 - v1) * b_v).sum() + ((h0 - h1) * b_h).sum()) / ((b_h * b_h).sum() + (b_v * b_v).sum())
+    part_v = (v1 - v0) * der_v
+    part_h = (h1 - h0) * der_h
+    weights_grad = rate / Config.pretraining_batch_size * (torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
+    v_thresholds_grad = rate / Config.pretraining_batch_size * part_v.sum(0)
+    h_thresholds_grad = rate / Config.pretraining_batch_size * part_h.sum(0)
+
+    if delta_weights is None:
+        delta_weights = weights_grad
+        delta_v_thresholds = v_thresholds_grad
+        delta_h_thresholds = h_thresholds_grad
+    else:
+        delta_weights = delta_weights * momentum + weights_grad
+        delta_v_thresholds = delta_v_thresholds * momentum + v_thresholds_grad
+        delta_h_thresholds = delta_h_thresholds * momentum + h_thresholds_grad
+    rbm.W -= delta_weights
+    rbm.v -= delta_v_thresholds
+    rbm.h -= delta_h_thresholds
+    part_loss = ((v1 - v0) ** 2).sum()
+    return part_loss, h0
+
+
+def batch_train_crbm(rbm, batch, pretrain_type, delta_weights=None, delta_v_thresholds=None, delta_h_thresholds=None,
+                     momentum=0):
+    act_func = rbm.a_func
+    v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(batch)
+    if pretrain_type == PretrainingType.RBMClassic:
+        der_v, der_h = 1, 1
+        rate = Config.pretraining_rate
+    if pretrain_type == PretrainingType.REBA:
+        der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
+        der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
+        rate = Config.pretraining_rate_reba
+    part_v = (v1 - v0) * der_v
+    part_h = (h1 - h0) * der_h
+    first_convolution_part = torch.convolution(
+        torch.permute(part_v, (1, 0, 2, 3)),
+        torch.permute(h0, (1, 0, 2, 3)), None, stride=[1, 1], padding=[0, 0], dilation=[1, 1], transposed=False,
+        output_padding=[0, 0], groups=1)
+    second_convolution_part = torch.convolution(
+        torch.permute(v1, (1, 0, 2, 3)),
+        torch.permute(part_h, (1, 0, 2, 3)), None, stride=[1, 1], padding=[0, 0], dilation=[1, 1], transposed=False,
+        output_padding=[0, 0], groups=1)
+    common_conv_expr = first_convolution_part + second_convolution_part
+
+    weights_grad = rate / Config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
+    v_thresholds_grad = rate / (Config.pretraining_batch_size * part_v.shape[2] ** 2) * part_v.sum((0, 2, 3)).reshape(
+        rbm.v.shape)
+    h_thresholds_grad = rate / (Config.pretraining_batch_size * part_h.shape[2] ** 2) * part_h.sum((0, 2, 3)).reshape(
+        rbm.h.shape)
+
+    if delta_weights is None:
+        delta_weights = weights_grad
+        delta_v_thresholds = v_thresholds_grad
+        delta_h_thresholds = h_thresholds_grad
+    else:
+        delta_weights = delta_weights * momentum + weights_grad
+        delta_v_thresholds = delta_v_thresholds * momentum + v_thresholds_grad
+        delta_h_thresholds = delta_h_thresholds * momentum + h_thresholds_grad
+
+    rbm.W -= delta_weights
+    rbm.v -= delta_v_thresholds
+    rbm.h -= delta_h_thresholds
+    part_loss = ((v1 - v0) ** 2).sum()
+    return part_loss, h0
+
+
 def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
     delta_weights = torch.zeros(rbm.W.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
-    act_func = rbm.a_func
+    # act_func = rbm.a_func
     for epoch in range(Config.pretraining_epochs):
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
@@ -37,28 +123,30 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
         while i < batches_count:
             inputs = train_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
-            v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
-            if pretrain_type == PretrainingType.RBMClassic:
-                der_v, der_h = 1, 1
-                rate = Config.pretraining_rate
-            elif pretrain_type == PretrainingType.REBA:
-                der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
-                der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
-                rate = Config.pretraining_rate_reba
-            if Config.with_adaptive_rate:
-                b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
-                b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
-                rate = (((v0-v1) * b_v).sum() + ((h0-h1) * b_h).sum()) / ((b_h*b_h).sum() + (b_v*b_v).sum())
-            part_v = (v1 - v0) * der_v
-            part_h = (h1 - h0) * der_h
-            delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * (
-                    torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
-            delta_v_thresholds = delta_v_thresholds * momentum + rate / Config.pretraining_batch_size * part_v.sum(0)
-            delta_h_thresholds = delta_h_thresholds * momentum + rate / Config.pretraining_batch_size * part_h.sum(0)
-            rbm.W -= delta_weights
-            rbm.v -= delta_v_thresholds
-            rbm.h -= delta_h_thresholds
-            part_loss = ((v1 - v0) ** 2).sum()
+            part_loss, h0 = batch_train_rbm(rbm, inputs, pretrain_type, delta_weights, delta_v_thresholds,
+                                            delta_h_thresholds, momentum)
+            # v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
+            # if pretrain_type == PretrainingType.RBMClassic:
+            #     der_v, der_h = 1, 1
+            #     rate = Config.pretraining_rate
+            # elif pretrain_type == PretrainingType.REBA:
+            #     der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
+            #     der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
+            #     rate = Config.pretraining_rate_reba
+            # if Config.with_adaptive_rate:
+            #     b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
+            #     b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
+            #     rate = (((v0-v1) * b_v).sum() + ((h0-h1) * b_h).sum()) / ((b_h*b_h).sum() + (b_v*b_v).sum())
+            # part_v = (v1 - v0) * der_v
+            # part_h = (h1 - h0) * der_h
+            # delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * (
+            #         torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
+            # delta_v_thresholds = delta_v_thresholds * momentum + rate / Config.pretraining_batch_size * part_v.sum(0)
+            # delta_h_thresholds = delta_h_thresholds * momentum + rate / Config.pretraining_batch_size * part_h.sum(0)
+            # rbm.W -= delta_weights
+            # rbm.v -= delta_v_thresholds
+            # rbm.h -= delta_h_thresholds
+            # part_loss = ((v1 - v0) ** 2).sum()
             loss += part_loss.item()
             i += 1
         print(loss)
@@ -71,7 +159,7 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
-    act_func = rbm.a_func
+    # act_func = rbm.a_func
     for epoch in range(Config.pretraining_epochs):
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
@@ -80,35 +168,37 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
         while i < batches_count:
             inputs = train_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
-            v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
-            if pretrain_type == PretrainingType.RBMClassic:
-                der_v, der_h = 1, 1
-                rate = Config.pretraining_rate
-            if pretrain_type == PretrainingType.REBA:
-                der_v = (act_func[0](v1_ws+0.00001) - act_func[0](v1_ws-0.00001)) / 0.00002
-                der_h = (act_func[1](h1_ws+0.00001) - act_func[1](h1_ws-0.00001)) / 0.00002
-                rate = Config.pretraining_rate_reba
-            part_v = (v1 - v0) * der_v
-            part_h = (h1 - h0) * der_h
-            first_convolution_part = torch.convolution(
-                torch.permute(part_v, (1, 0, 2, 3)),
-                torch.permute(h0, (1, 0, 2, 3)), None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
-            second_convolution_part = torch.convolution(
-                torch.permute(v1, (1, 0, 2, 3)),
-                torch.permute(part_h, (1, 0, 2, 3)), None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
-            common_conv_expr = first_convolution_part + second_convolution_part
-
-            delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
-            delta_v_thresholds = delta_v_thresholds * momentum + rate / (Config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
-            delta_h_thresholds = delta_h_thresholds * momentum + rate / (Config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)
-
-            rbm.W -= delta_weights
-            rbm.v -= delta_v_thresholds
-            rbm.h -= delta_h_thresholds
-            loss += ((v1 - v0) ** 2).sum()
+            part_loss, h0 = batch_train_crbm(rbm, inputs, pretrain_type, delta_weights, delta_v_thresholds,
+                                             delta_h_thresholds, momentum)
+            # v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
+            # if pretrain_type == PretrainingType.RBMClassic:
+            #     der_v, der_h = 1, 1
+            #     rate = Config.pretraining_rate
+            # if pretrain_type == PretrainingType.REBA:
+            #     der_v = (act_func[0](v1_ws+0.00001) - act_func[0](v1_ws-0.00001)) / 0.00002
+            #     der_h = (act_func[1](h1_ws+0.00001) - act_func[1](h1_ws-0.00001)) / 0.00002
+            #     rate = Config.pretraining_rate_reba
+            # part_v = (v1 - v0) * der_v
+            # part_h = (h1 - h0) * der_h
+            # first_convolution_part = torch.convolution(
+            #     torch.permute(part_v, (1, 0, 2, 3)),
+            #     torch.permute(h0, (1, 0, 2, 3)), None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
+            # second_convolution_part = torch.convolution(
+            #     torch.permute(v1, (1, 0, 2, 3)),
+            #     torch.permute(part_h, (1, 0, 2, 3)), None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
+            # common_conv_expr = first_convolution_part + second_convolution_part
+            #
+            # delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
+            # delta_v_thresholds = delta_v_thresholds * momentum + rate / (Config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
+            # delta_h_thresholds = delta_h_thresholds * momentum + rate / (Config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)
+            #
+            # rbm.W -= delta_weights
+            # rbm.v -= delta_v_thresholds
+            # rbm.h -= delta_h_thresholds
+            loss += part_loss.item()
             i += 1
-        print(loss.item())
-        losses.append(loss.item())
+        print(loss)
+        losses.append(loss)
     return losses, h0.shape
 
 
@@ -167,6 +257,7 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     scheduler = StepLR(optimizer, 5, 0.5)
     test_loader = meta_data[3]
-    best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler, device)
+    best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler,
+                                               device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses

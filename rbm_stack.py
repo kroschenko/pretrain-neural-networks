@@ -34,7 +34,8 @@ class RBMStack:
                 resulted_array[_slice] = inputs
             else:
                 inputs = inputs.to(self.device)
-                v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = self.rbm_stack[layer_index - 1](inputs)
+                h0, _ = self.rbm_stack[layer_index - 1].visible_to_hidden(inputs)
+                # v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = self.rbm_stack[layer_index - 1](inputs)
                 resulted_array[_slice] = h0
             i += 1
         if len(self.layers[layer_index - 1]) == 3:
@@ -46,13 +47,13 @@ class RBMStack:
 
     def train(self, train_loader, pretrain_type, layer_train_type):
         layers_losses = {}
-        train_set = get_tensor_dataset_from_loader(train_loader)
-        train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, self.input_dim)
-        batches_count = len(train_set) / Config.pretraining_batch_size
         layer_index = 0
         if layer_train_type == LayerTrainType.PerLayer:
+            train_set = get_tensor_dataset_from_loader(train_loader)
+            train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, self.input_dim)
+            batches_count = len(train_set) / Config.pretraining_batch_size
             with torch.no_grad():
-                for rbm, layer in zip(self.rbm_stack, self.layers):
+                for rbm in self.rbm_stack:
                     if pretrain_type == PretrainingType.Hybrid:
                         current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
                     else:
@@ -66,7 +67,18 @@ class RBMStack:
                     train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, output_shape[1:],
                                                         layer_index)
         if layer_train_type == LayerTrainType.PerBatch:
-            pass
+            with torch.no_grad():
+                for i, data in enumerate(train_loader, 0):
+                    batch = data[0].to(self.device)
+                    for index in range(0, layer_index):
+                        batch, _ = self.rbm_stack[index].visible_to_hidden(batch)
+                    rbm = self.rbm_stack[layer_index]
+                    if pretrain_type == PretrainingType.Hybrid:
+                        current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+                    else:
+                        current_pretrain = pretrain_type
+                    utl.train_rbm_with_batch(rbm, batch, current_pretrain)
+                    layer_index = (layer_index + 1) % len(self.rbm_stack)
 
         return layers_losses
 
