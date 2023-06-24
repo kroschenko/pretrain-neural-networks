@@ -31,7 +31,7 @@ class UnifiedClassifier(nn.Module):
 
 
 class RBM(nn.Module):
-    def __init__(self, n_vis, n_hid, a_func, init_type, without_sampling, k):
+    def __init__(self, n_vis, n_hid, a_func, init_type, without_sampling, k, device):
         super(RBM, self).__init__()
         if init_type == InitTypes.Kaiming:
             W = torch.empty(n_vis, n_hid)
@@ -54,9 +54,9 @@ class RBM(nn.Module):
         self.a_func = a_func
         self.without_sampling = without_sampling
         self.k = k
-        self.delta_weights = torch.zeros(self.W.shape)
-        self.delta_v_thresholds = torch.zeros(self.v.shape)
-        self.delta_h_thresholds = torch.zeros(self.h.shape)
+        self.delta_weights = torch.zeros(self.W.shape).to(device)
+        self.delta_v_thresholds = torch.zeros(self.v.shape).to(device)
+        self.delta_h_thresholds = torch.zeros(self.h.shape).to(device)
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.mm(v, self.W) + self.h
@@ -95,7 +95,7 @@ class RBM(nn.Module):
 
 
 class CRBM(nn.Module):
-    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, without_sampling, k):
+    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, without_sampling, k, device):
         super(CRBM, self).__init__()
         if init_type == InitTypes.Kaiming:
             W = torch.empty(n_hid_channels, n_vis_channels, kernel_size, kernel_size)
@@ -112,9 +112,9 @@ class CRBM(nn.Module):
         self.a_func = a_func
         self.without_sampling = without_sampling
         self.k = k
-        self.delta_weights = torch.zeros(self.W.shape)
-        self.delta_v_thresholds = torch.zeros(self.v.shape)
-        self.delta_h_thresholds = torch.zeros(self.h.shape)
+        self.delta_weights = torch.zeros(self.W.shape).to(device)
+        self.delta_v_thresholds = torch.zeros(self.v.shape).to(device)
+        self.delta_h_thresholds = torch.zeros(self.h.shape).to(device)
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.convolution(v, self.W, None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
