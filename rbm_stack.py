@@ -86,9 +86,9 @@ class RBMStack:
                             current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
                         else:
                             current_pretrain = pretrain_type
-                        loss += utl.train_rbm_with_batch(rbm, batch, current_pretrain)
+                        loss += utl.train_rbm_with_batch(rbm, batch, current_pretrain.item())
                         layer_index = (layer_index + 1) % len(self.rbm_stack)
-                    print(loss.item())
+                    print(loss)
                         # print(layer_index)
 
         return layers_losses
