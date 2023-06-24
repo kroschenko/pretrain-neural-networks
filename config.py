@@ -48,7 +48,7 @@ class Config:
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
-    layer_train_type = LayerTrainType.PerLayer
+    layer_train_type = LayerTrainType.PerBatch
     k = 1
 
 

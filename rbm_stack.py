@@ -68,17 +68,26 @@ class RBMStack:
                                                         layer_index)
         if layer_train_type == LayerTrainType.PerBatch:
             with torch.no_grad():
-                for i, data in enumerate(train_loader, 0):
-                    batch = data[0].to(self.device)
-                    for index in range(0, layer_index):
-                        batch, _ = self.rbm_stack[index].visible_to_hidden(batch)
-                    rbm = self.rbm_stack[layer_index]
-                    if pretrain_type == PretrainingType.Hybrid:
-                        current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
-                    else:
-                        current_pretrain = pretrain_type
-                    utl.train_rbm_with_batch(rbm, batch, current_pretrain)
-                    layer_index = (layer_index + 1) % len(self.rbm_stack)
+                for epoch in range(Config.finetuning_epochs):
+                    for i, data in enumerate(train_loader, 0):
+                        batch = data[0].to(self.device)
+                        # print(batch.shape)
+                        for index in range(0, layer_index):
+                            batch, _ = self.rbm_stack[index].visible_to_hidden(batch)
+                            if len(self.layers[index]) == 3:
+                                post_processing_actions = self.layers[index][2]
+                                for action in post_processing_actions:
+                                    if not isinstance(action, torch.nn.Dropout):
+                                        batch = action(batch)
+                        # print(batch.shape)
+                        rbm = self.rbm_stack[layer_index]
+                        if pretrain_type == PretrainingType.Hybrid:
+                            current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+                        else:
+                            current_pretrain = pretrain_type
+                        utl.train_rbm_with_batch(rbm, batch, current_pretrain)
+                        layer_index = (layer_index + 1) % len(self.rbm_stack)
+                        # print(layer_index)
 
         return layers_losses
 
