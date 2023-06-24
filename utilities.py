@@ -32,7 +32,6 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
     for epoch in range(Config.pretraining_epochs):
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
-        print(len(train_set))
         loss = 0.
         i = 0
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
@@ -76,7 +75,6 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     for epoch in range(Config.pretraining_epochs):
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
-        print(len(train_set))
         loss = 0.0
         i = 0
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
