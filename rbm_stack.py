@@ -88,7 +88,7 @@ class RBMStack:
                             current_pretrain = pretrain_type
                         loss += utl.train_rbm_with_batch(rbm, batch, current_pretrain)
                         layer_index = (layer_index + 1) % len(self.rbm_stack)
-                    print(loss)
+                    print(loss.item())
                         # print(layer_index)
 
         return layers_losses
