@@ -32,6 +32,7 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
     for epoch in range(Config.pretraining_epochs):
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
+        print(len(train_set))
         loss = 0.
         i = 0
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
@@ -45,14 +46,6 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
                 der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
                 der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
                 rate = Config.pretraining_rate_reba
-            # elif pretrain_type == PretrainingType.Hybrid:
-            #     if epoch < 7:
-            #         der_v, der_h = 1, 1
-            #         rate = config.pretraining_rate
-            #     else:
-            #         der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
-            #         der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
-            #         rate = config.pretraining_rate_reba
             if Config.with_adaptive_rate:
                 b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
                 b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
@@ -83,14 +76,13 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     for epoch in range(Config.pretraining_epochs):
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
+        print(len(train_set))
         loss = 0.0
         i = 0
         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
         while i < batches_count:
             inputs = train_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
             v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = rbm(inputs)
-            # print()
-            # print(v1.shape())
             if pretrain_type == PretrainingType.RBMClassic:
                 der_v, der_h = 1, 1
                 rate = Config.pretraining_rate
@@ -98,14 +90,6 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
                 der_v = (act_func[0](v1_ws+0.00001) - act_func[0](v1_ws-0.00001)) / 0.00002
                 der_h = (act_func[1](h1_ws+0.00001) - act_func[1](h1_ws-0.00001)) / 0.00002
                 rate = Config.pretraining_rate_reba
-            # if pretrain_type == PretrainingType.Hybrid:
-            #     if epoch < 7:
-            #         der_v, der_h = 1, 1
-            #         rate = config.pretraining_rate
-            #     else:
-            #         der_v = (act_func(v1_ws + 0.00001) - act_func(v1_ws - 0.00001)) / 0.00002
-            #         der_h = (act_func(h1_ws + 0.00001) - act_func(h1_ws - 0.00001)) / 0.00002
-            #         rate = config.pretraining_rate_reba
             part_v = (v1 - v0) * der_v
             part_h = (h1 - h0) * der_h
             first_convolution_part = torch.convolution(
@@ -116,7 +100,6 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
                 torch.permute(part_h, (1, 0, 2, 3)), None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
             common_conv_expr = first_convolution_part + second_convolution_part
 
-            # print(part_h.sum((0, 2, 3)).shape)
             delta_weights = delta_weights * momentum + rate / Config.pretraining_batch_size * torch.permute(common_conv_expr, (1, 0, 2, 3))
             delta_v_thresholds = delta_v_thresholds * momentum + rate / (Config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
             delta_h_thresholds = delta_h_thresholds * momentum + rate / (Config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)

@@ -33,7 +33,7 @@ class Conditions:
 #     api_token=ProjectConfig.api_token
 # )
 
-DATASETS = [DatasetType.CIFAR100]
+DATASETS = [DatasetType.CIFAR10]
 include_pretraining_types = [PretrainingType.Hybrid, PretrainingType.RBMClassic]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:

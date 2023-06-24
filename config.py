@@ -65,19 +65,7 @@ pooling = nn.MaxPool2d(kernel_size=2)
 
 def get_layers_config_for_dataset(experiment_dataset_name):
     layers_config_selector = {
-        # utl.DatasetType.IRIS: [
-        #     {"architecture": [4, 10, 10, 3], "activation": [torch.relu]}
-        # ]
         DatasetType.MNIST: [
-            # {"architecture": [
-            #     [(784, 1600), [sigmoid, sigmoid]],
-            #     [(1600, 1600), [sigmoid, sigmoid]],
-            #     [(1600, 800), [sigmoid, sigmoid]],
-            #     [(800, 800), [sigmoid, sigmoid]],
-            #     [(800, 800), [sigmoid, sigmoid]],
-            #     [(800, 800), [sigmoid, sigmoid]],
-            #     [(800, 10), [linear]]
-            # ], "input_dim": 784},
             # {"architecture": [
             #     [(784, 1600), relu],
             #     [(1600, 1600), relu],
@@ -92,25 +80,6 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(320, 160), [relu, relu]],
                 [(160, 10), [logsoftmax]],
             ], "input_dim": (1, 28, 28)},
-            # {"architecture": [
-            #     [(1, 20, 5), relu, [pooling]],
-            #     [(20, 40, 5), relu, [pooling, add_postprocessing]],
-            #     [(640, 1000), relu, [dropout]],
-            #     [(1000, 1000), relu, [dropout]],
-            #     [(1000, 10), softmax],
-            # ], "input_dim": (1, 28, 28)},
-            # {"architecture": [
-            #     [(1, 20, 11), relu, [add_postprocessing]],
-            #     [(6480, 2880), relu, [dropout, unflatten]],
-            #     [(20, 40, 11), relu, [add_postprocessing]],
-            #     [(160, 100), relu, [dropout]],
-            #     [(100, 100), relu, [dropout]],
-            #     [(100, 10), softmax],
-            # ], "input_dim": (1, 28, 28)},
-            # {"architecture": [784, 800, 800, 10], "activation": [torch.relu]},
-            # {"architecture": [[1, (28, 28)], [6, (11, 11), (18, 18)], [6, (11, 11), (8, 8)], [6, (8, 8), (1, 1)]], "activation": [torch.sigmoid]}
-            # {"architecture": [784, 1600, 1600, 800, 800, 10], "activation": [torch.relu]},
-            # {"architecture": [[(7, 7), 32], [(5, 5), 16], [(5, 5), 8], 256, 10], "activation": [torch.relu]},
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
@@ -119,8 +88,6 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(800, 128), [tanh, relu], [dropout]],
                 [(128, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
-            # [3072, 1024, 512, 256, 128, 64, 10],
-            # [3072, 512, 256, 128, 64, 10]
         ],
         DatasetType.CIFAR100: [
             {"architecture": [
