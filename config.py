@@ -116,7 +116,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 64, 5), [sigmoid, relu], [pooling]],
                 [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu]],
+                [(800, 128), [tanh, relu], [dropout]],
                 [(128, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
             # [3072, 1024, 512, 256, 128, 64, 10],
@@ -126,7 +126,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 64, 5), [sigmoid, relu], [pooling]],
                 [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu]],
+                [(800, 128), [tanh, relu], [dropout]],
                 [(128, 100), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ]

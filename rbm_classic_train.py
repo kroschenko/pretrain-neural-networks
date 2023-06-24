@@ -34,6 +34,7 @@ class Conditions:
 # )
 
 DATASETS = [DatasetType.CIFAR100]
+include_pretraining_types = [PretrainingType.Hybrid, PretrainingType.RBMClassic]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:
     current_experiment_dataset_name = dataset
@@ -41,7 +42,7 @@ for dataset in DATASETS:
     random_seeds, layers_variants = get_experiment_params(current_experiment_dataset_name)
     conditions = "undefined_"
     pretraining_types = list(PretrainingType)
-    for pretraining_type in pretraining_types:
+    for pretraining_type in include_pretraining_types:
         print(pretraining_type)
         for layers_config in layers_variants:
             stat = Statistics()
