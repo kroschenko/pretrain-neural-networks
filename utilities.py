@@ -165,7 +165,7 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     # criterion = nn.CrossEntropyLoss(reduction="sum")
     # optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
     optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
-    scheduler = StepLR(optimizer, 5, 0.5)
+    scheduler = StepLR(optimizer, 10, 0.5)
     test_loader = meta_data[3]
     best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler, device)
 
