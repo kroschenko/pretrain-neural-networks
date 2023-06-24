@@ -68,7 +68,8 @@ class RBMStack:
                                                         layer_index)
         if layer_train_type == LayerTrainType.PerBatch:
             with torch.no_grad():
-                for epoch in range(Config.finetuning_epochs):
+                for epoch in range(Config.pretraining_epochs):
+                    loss = 0
                     for i, data in enumerate(train_loader, 0):
                         batch = data[0].to(self.device)
                         # print(batch.shape)
@@ -85,8 +86,9 @@ class RBMStack:
                             current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
                         else:
                             current_pretrain = pretrain_type
-                        utl.train_rbm_with_batch(rbm, batch, current_pretrain)
+                        loss += utl.train_rbm_with_batch(rbm, batch, current_pretrain)
                         layer_index = (layer_index + 1) % len(self.rbm_stack)
+                    print(loss)
                         # print(layer_index)
 
         return layers_losses

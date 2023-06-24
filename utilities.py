@@ -26,6 +26,7 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
 def train_rbm_with_batch(rbm, batch, pretrain_type):
     train_func = batch_train_rbm if isinstance(rbm, RBM) else batch_train_crbm
     losses, _ = train_func(rbm, batch, pretrain_type)
+    return losses
 
 
 def batch_train_rbm(rbm, batch, pretrain_type, delta_weights=None, delta_v_thresholds=None, delta_h_thresholds=None,
