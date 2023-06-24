@@ -54,6 +54,9 @@ class RBM(nn.Module):
         self.a_func = a_func
         self.without_sampling = without_sampling
         self.k = k
+        self.delta_weights = torch.zeros(self.W.shape)
+        self.delta_v_thresholds = torch.zeros(self.v.shape)
+        self.delta_h_thresholds = torch.zeros(self.h.shape)
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.mm(v, self.W) + self.h
@@ -109,6 +112,9 @@ class CRBM(nn.Module):
         self.a_func = a_func
         self.without_sampling = without_sampling
         self.k = k
+        self.delta_weights = torch.zeros(self.W.shape)
+        self.delta_v_thresholds = torch.zeros(self.v.shape)
+        self.delta_h_thresholds = torch.zeros(self.h.shape)
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.convolution(v, self.W, None, stride=[1,1], padding=[0,0], dilation=[1,1], transposed=False, output_padding=[0,0], groups=1)
