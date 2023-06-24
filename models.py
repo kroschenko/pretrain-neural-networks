@@ -97,7 +97,9 @@ class CRBM(nn.Module):
             self.v = nn.Parameter(0.01 * torch.randn(1, n_vis_channels, 1, 1))
             self.h = nn.Parameter(0.01 * torch.randn(1, n_hid_channels, 1, 1))
         elif init_type == InitTypes.SimpleUniform:
-            self.W = nn.Parameter(0.02 * torch.randn(n_hid_channels, n_vis_channels, kernel_size, kernel_size) - 0.01)
+            self.W = nn.Parameter(0.02 * torch.rand(n_hid_channels, n_vis_channels, kernel_size, kernel_size) - 0.01)
+            self.v = nn.Parameter(0.02 * torch.rand(1, n_vis_channels, 1, 1) - 0.01)
+            self.h = nn.Parameter(0.02 * torch.rand(1, n_hid_channels, 1, 1) - 0.01)
         self.a_func = a_func
         self.without_sampling = without_sampling
 
@@ -114,7 +116,6 @@ class CRBM(nn.Module):
 
     def forward(self, v0):
         h0, h0_ws = self.visible_to_hidden(v0)
-        # print(h0.sum())
         if self.without_sampling:
             h_sampled = h0
         else:
