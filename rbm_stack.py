@@ -8,7 +8,7 @@ from data_config import get_tensor_dataset_from_loader
 
 
 class RBMStack:
-    def __init__(self, layers_config, device, init_type, without_sampling, k):
+    def __init__(self, layers_config, device, init_type, with_sampling):
         self.rbm_stack = []
         self.layers = layers_config["architecture"]
         self.input_dim = layers_config["input_dim"]
@@ -17,7 +17,7 @@ class RBMStack:
             layer_params = self.layers[i][0]
             layer_activation_function = self.layers[i][1]
             rbm_constructor = RBM if len(layer_params) == 2 else CRBM
-            rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, without_sampling, k)
+            rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, with_sampling)
             self.rbm_stack.append(rbm.to(self.device))
 
     def _prepare_train_set(self, train_set, batch_size, input_dim, layer_index=0):
@@ -74,27 +74,27 @@ class RBMStack:
         with torch.no_grad():
             for i in range(0, len(torch_model.layers) - 1):
                 if len(torch_model.layers_config[i][0]) == 2:
-                    torch_model.layers[i].weight.data = self.rbm_stack[i].W.T
+                    torch_model.layers[i].weight.data = self.rbm_stack[i].weights.T
                     torch_model.layers[i].bias.data = torch.reshape(self.rbm_stack[i].h, (len(self.rbm_stack[i].h[0]),))
                 if len(torch_model.layers_config[i][0]) == 3:
-                    torch_model.layers[i].weight.data = self.rbm_stack[i].W
+                    torch_model.layers[i].weight.data = self.rbm_stack[i].weights
                     torch_model.layers[i].bias.data = self.rbm_stack[i].h.reshape(torch_model.layers[i].bias.data.shape)
 
     def do_reduction(self, layers_config):
         with torch.no_grad():
             for i in range(0, len(self.layers) - 1):
-                mask = torch.abs(self.rbm_stack[i].W) > Config.reduction_param
+                mask = torch.abs(self.rbm_stack[i].weights) > Config.reduction_param
                 # reduction_params_count = (~mask).sum() * 100. / mask.numel()
-                self.rbm_stack[i].W *= mask.double()
+                self.rbm_stack[i].weights *= mask.double()
             condition = None
             for i in range(0, len(self.layers) - 1):
                 if condition is not None:
-                    self.rbm_stack[i].W = nn.Parameter(self.rbm_stack[i].W[condition])
-                condition = torch.abs(self.rbm_stack[i].W).sum(dim=0) != 0
+                    self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition])
+                condition = torch.abs(self.rbm_stack[i].weights).sum(dim=0) != 0
                 # removed_columns_indices = torch.where(~condition)[0]
-                self.rbm_stack[i].W = nn.Parameter(self.rbm_stack[i].W[:, condition])
+                self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
                 self.rbm_stack[i].h = nn.Parameter(self.rbm_stack[i].h[:, condition])
-                layers_config["architecture"][i][0] = tuple(self.rbm_stack[i].W.shape)
+                layers_config["architecture"][i][0] = tuple(self.rbm_stack[i].weights.shape)
             previous_neurons_count = layers_config["architecture"][len(self.layers)-2][0][1]
             end_layer_neurons_count = layers_config["architecture"][len(self.layers)-1][0][1]
             layers_config["architecture"][len(self.layers)-1][0] = (previous_neurons_count, end_layer_neurons_count)

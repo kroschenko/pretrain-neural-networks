@@ -44,12 +44,11 @@ class Config:
     test_every_epochs = 1
     count_attempts_in_experiment = 1
     init_type = InitTypes.SimpleNormal
-    without_sampling = True
+    with_sampling = False
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
     layer_train_type = LayerTrainType.PerLayer
-    k = 1
 
 
 relu = nn.ReLU()

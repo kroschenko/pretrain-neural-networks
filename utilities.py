@@ -24,7 +24,7 @@ def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches
 
 
 def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
-    delta_weights = torch.zeros(rbm.W.shape).to(device)
+    delta_weights = torch.zeros(rbm.weights.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
@@ -55,7 +55,7 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
                     torch.mm(part_v.T, h0) + torch.mm(v1.T, part_h))
             delta_v_thresholds = delta_v_thresholds * momentum + rate / Config.pretraining_batch_size * part_v.sum(0)
             delta_h_thresholds = delta_h_thresholds * momentum + rate / Config.pretraining_batch_size * part_h.sum(0)
-            rbm.W -= delta_weights
+            rbm.weights -= delta_weights
             rbm.v -= delta_v_thresholds
             rbm.h -= delta_h_thresholds
             part_loss = ((v1 - v0) ** 2).sum()
@@ -67,7 +67,7 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
 
 
 def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
-    delta_weights = torch.zeros(rbm.W.shape).to(device)
+    delta_weights = torch.zeros(rbm.weights.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
@@ -102,7 +102,7 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
             delta_v_thresholds = delta_v_thresholds * momentum + rate / (Config.pretraining_batch_size*part_v.shape[2]**2) * part_v.sum((0, 2, 3)).reshape(rbm.v.shape)
             delta_h_thresholds = delta_h_thresholds * momentum + rate / (Config.pretraining_batch_size*part_h.shape[2]**2) * part_h.sum((0, 2, 3)).reshape(rbm.h.shape)
 
-            rbm.W -= delta_weights
+            rbm.weights -= delta_weights
             rbm.v -= delta_v_thresholds
             rbm.h -= delta_h_thresholds
             loss += ((v1 - v0) ** 2).sum()
@@ -149,8 +149,8 @@ def test_torch_model(model, test_loader, device):
     return 100 * float(correct_answers) / len(test_loader.dataset)
 
 
-def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, without_sampling, k):
-    rbm_stack = RBMStack(layers_config, device, init_type, without_sampling, k)
+def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, without_sampling):
+    rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
     train_loader = meta_data[2]
     if pretrain_type != PretrainingType.Without:
