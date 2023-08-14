@@ -112,9 +112,11 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
     return losses, h0.shape
 
 
-def train_torch_model(model, train_loader, test_loader, optimizer, criterion, scheduler, device):
+def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device):
     best_total_accuracy = 0
     losses = []
+    train_loader = meta_data[0]
+    test_loader = meta_data[1]
     for epoch in range(Config.finetuning_epochs):
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
@@ -155,7 +157,7 @@ def test_torch_model(model, test_loader, criterion, device):
 def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, without_sampling):
     rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
-    train_loader = meta_data[2]
+    train_loader = meta_data[0]
     if pretrain_type != PretrainingType.Without:
         layers_losses = rbm_stack.train(train_loader, pretrain_type, layer_train_type=Config.layer_train_type)
         if Config.with_reduction:
@@ -169,7 +171,7 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     # optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
     optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     scheduler = StepLR(optimizer, 10, 0.5)
-    test_loader = meta_data[3]
-    best_total_acc, losses = train_torch_model(classifier, train_loader, test_loader, optimizer, criterion, scheduler, device)
+    test_loader = meta_data[1]
+    best_total_acc, losses = train_torch_model(classifier, meta_data, optimizer, criterion, scheduler, device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
