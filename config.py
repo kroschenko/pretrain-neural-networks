@@ -49,6 +49,8 @@ class Config:
     with_adaptive_rate = False
     reduction_param = 0.01
     layer_train_type = LayerTrainType.PerLayer
+    use_validation_dataset = True
+    validation_split_value = 0.8
 
 
 relu = nn.ReLU()

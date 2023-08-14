@@ -2,6 +2,8 @@ import torch
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
+
+import config
 from common_types import DatasetType
 import torchvision.datasets as datasets
 
@@ -70,8 +72,15 @@ def get_torch_dataset(dataset_type, batch_size):
         dataset_con = get_dataset_constructor(dataset_type)
         train_set = dataset_con(root='./data', train=True, download=True, transform=transform)
         test_set = dataset_con(root='./data', train=False, download=True, transform=transform)
+        val_set = None
+        if config.Config.use_validation_dataset:
+            train_size = int(len(train_set.data) * config.Config.validation_split_value)
+            val_size = len(train_set.data) - train_size
+            train_set, val_set = torch.utils.data.random_split(
+                train_set, [int(len(train_set.data) * config.Config.validation_split_value), val_size])
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
+        val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=False) if config.Config.use_validation_dataset else None
     return train_set, test_set, train_loader, test_loader
 
 
