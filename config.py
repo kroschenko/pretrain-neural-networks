@@ -50,7 +50,7 @@ class Config:
     reduction_param = 0.01
     layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = True
-    validation_split_value = 0.8
+    validation_split_value = 0.9
 
 
 relu = nn.ReLU()

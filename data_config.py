@@ -82,7 +82,7 @@ def get_torch_dataset(dataset_type, batch_size):
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
         val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=False) if config.Config.use_validation_dataset else None
         print(len(train_set.dataset.data[train_set.indices]))
-        print(len(val_set.dataset.targets[val_set.indices]))
+        print(len(val_set.dataset.data[val_set.indices]))
     return train_set, test_set, train_loader, test_loader
 
 
