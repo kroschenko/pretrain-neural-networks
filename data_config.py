@@ -48,6 +48,19 @@ transform_CIFAR = transforms.Compose(
      ]
 )
 
+transform_CIFAR_train = transforms.Compose(
+    [
+        transforms.ToTensor(),
+        transforms.RandomRotation(5),
+    ]
+)
+
+transform_COMMON = transforms.Compose(
+    [
+        transforms.ToTensor(),
+    ]
+)
+
 def get_dataset_constructor(dataset_type: DatasetType):
     dataset_selector = {
         DatasetType.MNIST: datasets.MNIST,
@@ -61,7 +74,7 @@ def get_torch_dataset(dataset_type, batch_size):
     dataset_selector = {
         DatasetType.MNIST: transform_MNIST,
         DatasetType.CIFAR10: transform_CIFAR,
-        DatasetType.CIFAR100: transform_CIFAR,
+        DatasetType.CIFAR100: transform_CIFAR_train,
     }
     if dataset_type == DatasetType.IRIS:
         train_set = IrisDataset("./data/fisher_irises/iris_train.txt")  # 120 items
@@ -72,13 +85,14 @@ def get_torch_dataset(dataset_type, batch_size):
         transform = dataset_selector[dataset_type]
         dataset_con = get_dataset_constructor(dataset_type)
         train_set = dataset_con(root='./data', train=True, download=True, transform=transform)
-        test_set = dataset_con(root='./data', train=False, download=True, transform=transform)
+        test_set = dataset_con(root='./data', train=False, download=True, transform=transform_COMMON)
         val_set = None
         if config.Config.use_validation_dataset:
             train_size = int(len(train_set.data) * config.Config.validation_split_value)
             val_size = len(train_set.data) - train_size
             train_set, val_set = torch.utils.data.random_split(
                 train_set, [int(len(train_set.data) * config.Config.validation_split_value), val_size])
+            val_set.dataset.transform = transform_COMMON
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
         val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=False) if config.Config.use_validation_dataset else None
