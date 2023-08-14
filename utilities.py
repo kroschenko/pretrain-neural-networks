@@ -105,10 +105,10 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
             rbm.weights -= delta_weights
             rbm.v -= delta_v_thresholds
             rbm.h -= delta_h_thresholds
-            loss += ((v1 - v0) ** 2).sum()
+            loss += ((v1 - v0) ** 2).sum().item()
             i += 1
-        print(loss.item())
-        losses.append(loss.item())
+        print(loss)
+        losses.append(loss)
     return losses, h0.shape
 
 
@@ -130,23 +130,26 @@ def train_torch_model(model, train_loader, test_loader, optimizer, criterion, sc
             running_loss += loss.item()
         scheduler.step()
         if epoch % Config.test_every_epochs == 0:
-            current_accuracy = test_torch_model(model, test_loader, device)
+            current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
+            print(test_loss)
         losses.append(running_loss)
-        print(running_loss)
+        # print(running_loss)
     return best_total_accuracy, losses
 
 
-def test_torch_model(model, test_loader, device):
+def test_torch_model(model, test_loader, criterion, device):
     correct_answers = 0
+    test_loss = 0
     with torch.no_grad():
         for data in test_loader:
             images, labels = data[0].to(device), data[1].to(device)
             outputs = model(images)
+            test_loss += criterion(outputs, labels)
             _, predictions = torch.max(outputs, 1)
             correct_answers += (predictions == labels).sum()
-    return 100 * float(correct_answers) / len(test_loader.dataset)
+    return 100 * float(correct_answers) / len(test_loader.dataset), test_loss
 
 
 def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, without_sampling):
