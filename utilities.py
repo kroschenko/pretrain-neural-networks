@@ -133,7 +133,7 @@ def train_torch_model(model, train_loader, test_loader, optimizer, criterion, sc
             current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
-            print(test_loss)
+            print(str(test_loss.item()) + " " + str(current_accuracy))
         losses.append(running_loss)
         # print(running_loss)
     return best_total_accuracy, losses
