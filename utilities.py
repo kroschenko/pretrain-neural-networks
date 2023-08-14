@@ -118,7 +118,11 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
     train_loader = meta_data[0]
     test_loader = meta_data[1]
     val_loader = meta_data[2]
-    for epoch in range(Config.finetuning_epochs):
+    val_fail_counter = 0
+    epoch = 0
+    early_stop = False
+    prev_val_loss = 1e100
+    while not early_stop and epoch < Config.max_finetuning_epochs:
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -139,8 +143,13 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
             # print(str(test_loss.item()) + " " + str(current_accuracy))
         if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
             current_accuracy, val_loss = test_torch_model(model, val_loader, criterion, device)
+            val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
+            if val_fail_counter == Config.validation_decay:
+                early_stop = True
+            prev_val_loss = val_loss
             print("val loss = " + str(val_loss.item()) + " val_accuracy = " + str(current_accuracy))
         losses.append(running_loss)
+        epoch += 1
         # print(running_loss)
     return best_total_accuracy, losses
 

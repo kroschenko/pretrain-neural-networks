@@ -39,7 +39,7 @@ class Config:
     pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
-    finetuning_epochs = 25
+    max_finetuning_epochs = 25
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -52,6 +52,7 @@ class Config:
     use_validation_dataset = True
     validation_split_value = 0.9
     validate_every_epochs = 1
+    validation_decay = 3
 
 
 relu = nn.ReLU()
