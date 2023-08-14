@@ -43,7 +43,7 @@ transform_MNIST = transforms.Compose(
 
 transform_CIFAR = transforms.Compose(
     [transforms.ToTensor(),
-     transforms.RandomRotation(5),
+     # transforms.RandomRotation(5),
      # transforms.Lambda(_flatten)
      ]
 )
