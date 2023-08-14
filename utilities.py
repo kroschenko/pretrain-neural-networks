@@ -139,7 +139,7 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
             # print(str(test_loss.item()) + " " + str(current_accuracy))
         if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
             current_accuracy, val_loss = test_torch_model(model, val_loader, criterion, device)
-            print(str(val_loss.item()) + " " + str(current_accuracy))
+            print("val loss = " + str(val_loss.item()) + " val_accuracy = " + str(current_accuracy))
         losses.append(running_loss)
         # print(running_loss)
     return best_total_accuracy, losses
