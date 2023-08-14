@@ -122,6 +122,7 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
     epoch = 0
     early_stop = False
     prev_val_loss = 1e100
+    val_dataset_size = len(val_loader.dataset)
     while not early_stop and epoch < Config.max_finetuning_epochs:
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
