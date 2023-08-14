@@ -117,6 +117,7 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
     losses = []
     train_loader = meta_data[0]
     test_loader = meta_data[1]
+    val_loader = meta_data[2]
     for epoch in range(Config.finetuning_epochs):
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
@@ -135,7 +136,10 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
             current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
-            print(str(test_loss.item()) + " " + str(current_accuracy))
+            # print(str(test_loss.item()) + " " + str(current_accuracy))
+        if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
+            current_accuracy, val_loss = test_torch_model(model, val_loader, criterion, device)
+            print(str(val_loss.item()) + " " + str(current_accuracy))
         losses.append(running_loss)
         # print(running_loss)
     return best_total_accuracy, losses
@@ -171,7 +175,6 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     # optimizer = optim.SGD(classifier.parameters(), lr=config.finetune_rate, momentum=config.finetuning_momentum, weight_decay=1e-6)
     optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     scheduler = StepLR(optimizer, 10, 0.5)
-    test_loader = meta_data[1]
     best_total_acc, losses = train_torch_model(classifier, meta_data, optimizer, criterion, scheduler, device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses

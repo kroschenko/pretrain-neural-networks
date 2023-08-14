@@ -51,6 +51,7 @@ class Config:
     layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = True
     validation_split_value = 0.9
+    validate_every_epochs = 1
 
 
 relu = nn.ReLU()
