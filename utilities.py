@@ -133,6 +133,7 @@ def test_rbm(rbm_model, val_set, device):
             inputs = val_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
             v0, v1, _, _, _, _, _ = rbm_model(inputs)
             test_loss += ((v1 - v0) ** 2).sum().item()
+            i += 1
     return test_loss
 
 
