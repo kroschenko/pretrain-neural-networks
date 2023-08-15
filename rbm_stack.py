@@ -44,10 +44,12 @@ class RBMStack:
                     resulted_array = action(resulted_array)
         return resulted_array
 
-    def train(self, train_loader, pretrain_type, layer_train_type):
+    def train(self, train_loader, val_loader, pretrain_type, layer_train_type):
         layers_losses = {}
         train_set = get_tensor_dataset_from_loader(train_loader)
+        val_set = get_tensor_dataset_from_loader(val_loader)
         train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, self.input_dim)
+        val_set = self._prepare_train_set(val_set, Config.test_batch_size, self.input_dim)
         batches_count = len(train_set) / Config.pretraining_batch_size
         layer_index = 0
         if layer_train_type == LayerTrainType.PerLayer:
@@ -60,10 +62,12 @@ class RBMStack:
                     print(current_pretrain)
                     # layers_losses["layer_"+str(layer_index)], \
                     output_shape = utl.train_rbm_with_custom_dataset(
-                        train_set, self.device, rbm, current_pretrain, batches_count)
+                        train_set, val_set, self.device, rbm, current_pretrain, batches_count)
                     print(output_shape)
                     layer_index += 1
                     train_set = self._prepare_train_set(train_set, Config.pretraining_batch_size, output_shape[1:],
+                                                        layer_index)
+                    val_set = self._prepare_train_set(val_set, Config.test_batch_size, output_shape[1:],
                                                         layer_index)
         if layer_train_type == LayerTrainType.PerBatch:
             pass

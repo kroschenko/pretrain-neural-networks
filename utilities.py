@@ -18,13 +18,13 @@ def get_random_seeds(count):
     return seeds
 
 
-def train_rbm_with_custom_dataset(train_set, device, rbm, pretrain_type, batches_count):
+def train_rbm_with_custom_dataset(train_set, val_set, device, rbm, pretrain_type, batches_count):
     train_func = train_rbm if isinstance(rbm, RBM) else train_crbm
-    losses, output_shape = train_func(rbm, device, batches_count, train_set, pretrain_type)
+    losses, output_shape = train_func(rbm, device, batches_count, train_set, val_set, pretrain_type)
     return output_shape
 
 
-def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
+def train_rbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
     delta_weights = torch.zeros(rbm.weights.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
@@ -67,13 +67,18 @@ def train_rbm(rbm, device, batches_count, train_set, pretrain_type):
     return losses, h0.shape
 
 
-def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
+def train_crbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
     delta_weights = torch.zeros(rbm.weights.shape).to(device)
     delta_v_thresholds = torch.zeros(rbm.v.shape).to(device)
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
+    val_fail_counter = 0
+    epoch = 0
+    early_stop = False
+    prev_val_loss = 1e100
+    epoch = 0
     act_func = rbm.a_func
-    for epoch in range(Config.pretraining_epochs):
+    while not early_stop and epoch < Config.max_finetuning_epochs:
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
         loss = 0.0
@@ -108,9 +113,27 @@ def train_crbm(rbm, device, batches_count, train_set, pretrain_type):
             rbm.h -= delta_h_thresholds
             loss += ((v1 - v0) ** 2).sum().item()
             i += 1
-        print(loss)
+        # print(loss)
         losses.append(loss)
+        if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
+            val_loss = test_rbm(rbm, val_set, device)
+            val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
+            if val_fail_counter == Config.validation_decay:
+                early_stop = True
+            print(val_loss)
+        epoch += 1
     return losses, h0.shape
+
+
+def test_rbm(rbm_model, val_set, device):
+    test_loss = 0
+    i = 0
+    with torch.no_grad():
+        while i < Config.test_batch_size:
+            inputs = val_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
+            v0, v1, _ = rbm_model(inputs)
+            test_loss += ((v1 - v0) ** 2).sum().item()
+    return test_loss
 
 
 def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device):
@@ -123,7 +146,6 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
     epoch = 0
     early_stop = False
     prev_val_loss = 1e100
-    val_dataset_size = len(val_loader.dataset)
     while not early_stop and epoch < Config.max_finetuning_epochs:
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
@@ -142,7 +164,6 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
             current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
-            # print(str(test_loss.item()) + " " + str(current_accuracy))
         if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
             current_accuracy, val_loss = test_torch_model(model, val_loader, criterion, device)
             val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
@@ -152,7 +173,6 @@ def train_torch_model(model, meta_data, optimizer, criterion, scheduler, device)
             print("val loss = " + str(val_loss.item()) + " val_accuracy = " + str(current_accuracy))
         losses.append(running_loss)
         epoch += 1
-        # print(running_loss)
     return best_total_accuracy, losses
 
 
@@ -173,8 +193,9 @@ def run_experiment(layers_config, pretrain_type, meta_data, device, init_type, w
     rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
     train_loader = meta_data[0]
+    val_loader = meta_data[2]
     if pretrain_type != PretrainingType.Without:
-        layers_losses = rbm_stack.train(train_loader, pretrain_type, layer_train_type=Config.layer_train_type)
+        layers_losses = rbm_stack.train(train_loader, val_loader, pretrain_type, layer_train_type=Config.layer_train_type)
         if Config.with_reduction:
             rbm_stack.do_reduction(layers_config)
 
