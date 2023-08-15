@@ -131,7 +131,7 @@ def test_rbm(rbm_model, val_set, device):
     with torch.no_grad():
         while i < Config.test_batch_size:
             inputs = val_set[i * Config.pretraining_batch_size:(i + 1) * Config.pretraining_batch_size].to(device)
-            v0, v1, _ = rbm_model(inputs)
+            v0, v1, = rbm_model(inputs)
             test_loss += ((v1 - v0) ** 2).sum().item()
     return test_loss
 
