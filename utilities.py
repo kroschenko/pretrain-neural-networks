@@ -30,7 +30,11 @@ def train_rbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
     act_func = rbm.a_func
-    for epoch in range(Config.pretraining_epochs):
+    val_fail_counter = 0
+    early_stop = False
+    prev_val_loss = 1e100
+    epoch = 0
+    while not early_stop and epoch < Config.max_finetuning_epochs:
         rand_indx = torch.randperm(len(train_set))
         train_set = train_set[rand_indx]
         loss = 0.
@@ -62,8 +66,15 @@ def train_rbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
             part_loss = ((v1 - v0) ** 2).sum()
             loss += part_loss.item()
             i += 1
-        print(loss)
+        # print(loss)
         losses.append(loss)
+        if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
+            val_loss = test_rbm(rbm, val_set, device)
+            val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
+            if val_fail_counter == Config.validation_decay:
+                early_stop = True
+            print(val_loss)
+        epoch += 1
     return losses, h0.shape
 
 
@@ -73,7 +84,6 @@ def train_crbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
     delta_h_thresholds = torch.zeros(rbm.h.shape).to(device)
     losses = []
     val_fail_counter = 0
-    epoch = 0
     early_stop = False
     prev_val_loss = 1e100
     epoch = 0
