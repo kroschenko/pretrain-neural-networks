@@ -73,7 +73,7 @@ def train_rbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
             val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
             if val_fail_counter == Config.validation_decay:
                 early_stop = True
-            print(val_loss)
+            print("val_loss" + str(val_loss))
         epoch += 1
     return losses, h0.shape
 
@@ -130,7 +130,7 @@ def train_crbm(rbm, device, batches_count, train_set, val_set, pretrain_type):
             val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
             if val_fail_counter == Config.validation_decay:
                 early_stop = True
-            print(val_loss)
+            print("val_loss = " + str(val_loss))
         epoch += 1
     return losses, h0.shape
 
