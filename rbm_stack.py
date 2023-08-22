@@ -116,13 +116,14 @@ class RBMStack:
                 part_loss = ((v1 - v0) ** 2).sum()
                 loss += part_loss.item()
             losses.append(loss)
-            if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
-                val_loader = loaders["val_loader"]
-                val_loss = utl.test_rbm(rbm, val_loader, device)
-                val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
-                if val_fail_counter == Config.validation_decay:
-                    early_stop = True
-                print("val_loss" + str(val_loss))
+            print(loss)
+            # if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
+            #     val_loader = loaders["val_loader"]
+            #     val_loss = utl.test_rbm(rbm, val_loader, device)
+            #     val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
+            #     if val_fail_counter == Config.validation_decay:
+            #         early_stop = True
+            #     print("val_loss" + str(val_loss))
             epoch += 1
         return losses
 
@@ -176,14 +177,15 @@ class RBMStack:
                 rbm.v -= delta_v_thresholds
                 rbm.h -= delta_h_thresholds
                 loss += ((v1 - v0) ** 2).sum().item()
+            print(loss)
             losses.append(loss)
-            if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
-                val_loader = loaders["val_loader"]
-                val_loss = utl.test_rbm(rbm, val_loader, device)
-                val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
-                if val_fail_counter == Config.validation_decay:
-                    early_stop = True
-                print("val_loss = " + str(val_loss))
+            # if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
+            #     val_loader = loaders["val_loader"]
+            #     val_loss = utl.test_rbm(rbm, val_loader, device)
+            #     val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
+            #     if val_fail_counter == Config.validation_decay:
+            #         early_stop = True
+            #     print("val_loss = " + str(val_loss))
             epoch += 1
         return losses
 
