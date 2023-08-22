@@ -52,8 +52,8 @@ transform_CIFAR_train = transforms.Compose(
     [
         transforms.ToTensor(),
         # transforms.RandomRotation(5),
-        # transforms.RandomAffine(25),
-        # transforms.RandomHorizontalFlip(0.5),
+        transforms.RandomAffine(25),
+        transforms.RandomHorizontalFlip(0.5),
     ]
 )
 
@@ -77,7 +77,7 @@ def get_data_loaders(dataset_type, batch_size):
     loaders = {}
     dataset_selector = {
         DatasetType.MNIST: transform_MNIST,
-        DatasetType.CIFAR10: transform_CIFAR,
+        DatasetType.CIFAR10: transform_CIFAR_train,
         DatasetType.CIFAR100: transform_CIFAR_train,
     }
     if dataset_type == DatasetType.IRIS:
