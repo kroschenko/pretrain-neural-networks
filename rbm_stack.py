@@ -85,7 +85,7 @@ class RBMStack:
         prev_val_loss = 1e100
         epoch = 0
         train_loader = loaders["train_loader"]
-        while not early_stop and epoch < Config.max_finetuning_epochs:
+        while not early_stop and epoch < Config.pretraining_epochs:
             loss = 0.
             momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
             for i, data in enumerate(train_loader):
@@ -137,7 +137,7 @@ class RBMStack:
         epoch = 0
         act_func = rbm.a_func
         train_loader = loaders["train_loader"]
-        while not early_stop and epoch < Config.max_finetuning_epochs:
+        while not early_stop and epoch < Config.pretraining_epochs:
             loss = 0.0
             momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
             for i, data in enumerate(train_loader):
@@ -192,6 +192,12 @@ class RBMStack:
         data = original_data
         while current_layer_index < layer_index:
             data, _ = self.rbm_stack[current_layer_index].visible_to_hidden(data)
+            if len(self.layers[current_layer_index]) == 3:
+                post_processing_actions = self.layers[current_layer_index][2]
+                for action in post_processing_actions:
+                    if not isinstance(action, torch.nn.Dropout):
+                        data = action(data)
+            current_layer_index += 1
         return data
 
     def train_separate_rbm(self, loaders, device, rbm, pretrain_type, layer_index):
