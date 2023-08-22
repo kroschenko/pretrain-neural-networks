@@ -63,6 +63,7 @@ transform_COMMON = transforms.Compose(
     ]
 )
 
+
 def get_dataset_constructor(dataset_type: DatasetType):
     dataset_selector = {
         DatasetType.MNIST: datasets.MNIST,
@@ -72,17 +73,19 @@ def get_dataset_constructor(dataset_type: DatasetType):
     return dataset_selector[dataset_type]
 
 
-def get_torch_dataset(dataset_type, batch_size):
+def get_data_loaders(dataset_type, batch_size):
+    loaders = {}
     dataset_selector = {
         DatasetType.MNIST: transform_MNIST,
         DatasetType.CIFAR10: transform_CIFAR,
         DatasetType.CIFAR100: transform_CIFAR_train,
     }
     if dataset_type == DatasetType.IRIS:
-        train_set = IrisDataset("./data/fisher_irises/iris_train.txt")  # 120 items
-        test_set = IrisDataset("./data/fisher_irises/iris_test.txt")  # 30
+        train_set = IrisDataset("./data/fisher_irises/iris_train.txt")
+        test_set = IrisDataset("./data/fisher_irises/iris_test.txt")
         train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
+        val_loader = None
     else:
         transform = dataset_selector[dataset_type]
         dataset_con = get_dataset_constructor(dataset_type)
@@ -98,7 +101,10 @@ def get_torch_dataset(dataset_type, batch_size):
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
         val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=False) if config.Config.use_validation_dataset else None
-    return train_loader, test_loader, val_loader
+    loaders["train_loader"] = train_loader
+    loaders["test_loader"] = test_loader
+    loaders["val_loader"] = val_loader
+    return loaders
 
 
 def get_tensor_dataset_from_loader(torch_loader):

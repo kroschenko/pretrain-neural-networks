@@ -79,17 +79,6 @@ class RBM(RBMBase):
         output = self.a_func[0](weighted_sum)
         return output, weighted_sum
 
-    # def forward(self, v0):
-    #     h0, h0_ws = self.visible_to_hidden(v0)
-    #     if not self.without_sampling:
-    #         if self.a_func[1] == torch.sigmoid:
-    #             h0 = 1. * (h0 > torch.rand(h0.shape))
-    #         elif self.a_func[1] == torch.relu:
-    #             h0 += torch.normal(0, 1, size=h0.shape)
-    #     v1, v1_ws = self.hidden_to_visible(h0)
-    #     h1, h1_ws = self.visible_to_hidden(v1)
-    #     return v0, v1, v1_ws, h0, h0_ws, h1, h1_ws
-
     def __str__(self) -> str:
         return "vis: " + str(self.v.shape) + \
                "hid: " + str(self.h.shape)
@@ -130,17 +119,6 @@ class CRBM(RBMBase):
         )
         output = self.a_func[0](weighted_sum+self.v)
         return output, weighted_sum
-
-    # def forward(self, v0):
-    #     h0, h0_ws = self.visible_to_hidden(v0)
-    #     if not self.without_sampling:
-    #         if self.a_func[1] == torch.sigmoid:
-    #             h0 = 1. * (h0 > torch.rand(h0.shape))
-    #         elif self.a_func[1] == torch.relu:
-    #             h0 += torch.normal(0, 1, size=h0.shape)
-    #     v1, v1_ws = self.hidden_to_visible(h0)
-    #     h1, h1_ws = self.visible_to_hidden(v1)
-    #     return v0, v1, v1_ws, h0, h0_ws, h1, h1_ws
 
     def __str__(self) -> str:
         return "vis: " + str(self.v.shape) + "hid: " + str(self.h.shape)
