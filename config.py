@@ -88,10 +88,11 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 64, 5), [sigmoid, relu], [pooling]],
-                [(64, 32, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu]],
-                [(128, 10), [logsoftmax]],
+                [(3, 128, 5), [sigmoid, relu], [pooling]],
+                [(128, 64, 5), [relu, tanh], [pooling, add_postprocessing]],
+                [(1600, 1024), [tanh, relu]],
+                [(1024, 512), [relu, tanh]],
+                [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
         DatasetType.CIFAR100: [
