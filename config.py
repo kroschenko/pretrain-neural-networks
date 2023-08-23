@@ -66,9 +66,9 @@ add_postprocessing = nn.Flatten()
 unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.2)
 pooling = nn.MaxPool2d(kernel_size=2)
-bn32 = nn.BatchNorm2d(32)
-bn64 = nn.BatchNorm2d(64)
-bn128 = nn.BatchNorm2d(128)
+bn32 = nn.BatchNorm2d(32, affine=False)
+bn64 = nn.BatchNorm2d(64, affine=False)
+bn128 = nn.BatchNorm2d(128, affine=False)
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
