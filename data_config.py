@@ -51,10 +51,10 @@ transform_CIFAR = transforms.Compose(
 transform_CIFAR_train = transforms.Compose(
     [
         transforms.ToTensor(),
-        # transforms.RandomRotation(5),
-        transforms.RandomAffine(25),
+        # transforms.RandomAffine(25),
         transforms.RandomHorizontalFlip(0.5),
         transforms.RandomVerticalFlip(0.5),
+        transforms.RandomRotation(25),
     ]
 )
 
