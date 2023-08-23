@@ -39,7 +39,7 @@ class Config:
     pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
-    max_finetuning_epochs = 25
+    max_finetuning_epochs = 40
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -88,10 +88,12 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 128, 5), [sigmoid, relu], [pooling]],
-                [(128, 64, 5), [relu, tanh], [pooling, add_postprocessing]],
-                [(1600, 1024), [tanh, relu]],
-                [(1024, 512), [relu, tanh]],
+                [(3, 32, 3), [sigmoid, relu]],
+                [(32, 32, 3), [relu, tanh], [pooling]],
+                [(32, 64, 3), [tanh, relu]],
+                [(64, 64, 3), [relu, tanh], [pooling]],
+                [(64, 128, 3), [tanh, relu], [add_postprocessing]],
+                [(1152, 512), [relu, tanh]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
