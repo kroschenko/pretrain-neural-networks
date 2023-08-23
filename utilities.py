@@ -37,7 +37,7 @@ def train_torch_model(model, loaders, optimizer, criterion, scheduler, device):
     epoch = 0
     early_stop = False
     prev_val_loss = 1e100
-    while not early_stop and epoch < Config.max_finetuning_epochs:
+    while epoch < Config.max_finetuning_epochs:
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             inputs, labels = data[0].to(device), data[1].to(device)
