@@ -93,7 +93,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(32, 64, 3), [tanh, relu]],
                 [(64, 64, 3), [relu, tanh], [pooling]],
                 [(64, 128, 3), [tanh, relu], [add_postprocessing]],
-                [(1152, 512), [relu, tanh], [dropout]],
+                [(1152, 512), [relu, tanh]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
