@@ -98,7 +98,7 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     # )
     optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     scheduler = StepLR(optimizer, 5, 0.5)
-    loaders["train_loader"].dataset.transform = data_config.transform_COMMON
+    # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
     best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, scheduler, device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
