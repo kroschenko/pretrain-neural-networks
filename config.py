@@ -35,8 +35,8 @@ class Config:
     momentum_end = 0.9
     momentum_change_epoch = 5
     pretraining_epochs = 30
-    pretraining_rate = 0.00001  # 0.00002 # 0.001   0.00001 - MNIST
-    pretraining_rate_reba = 0.00001  # 0.00002 # 0.001  0.00004 - MNIST
+    pretraining_rate = 0.000125  # 0.00002 # 0.001   0.00001 - MNIST
+    pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
     max_finetuning_epochs = 40
@@ -93,11 +93,11 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         DatasetType.CIFAR10: [
             {"architecture": [
                 [(3, 32, 3), [sigmoid, relu]],
-                [(32, 32, 3), [relu, relu], [bn32, pooling]],
-                [(32, 64, 3), [linear, relu]],
-                [(64, 64, 3), [relu, relu], [bn64, pooling]],
-                [(64, 128, 3), [linear, relu], [bn128, add_postprocessing]],
-                [(1152, 512), [linear, relu]],
+                [(32, 32, 3), [relu, tanh], [pooling]],
+                [(32, 64, 3), [tanh, relu]],
+                [(64, 64, 3), [relu, tanh], [pooling]],
+                [(64, 128, 3), [tanh, relu], [add_postprocessing]],
+                [(1152, 512), [relu, tanh]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
