@@ -94,10 +94,10 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             {"architecture": [
                 [(3, 32, 3), [sigmoid, relu]],
                 [(32, 32, 3), [relu, relu], [bn32, pooling]],
-                [(32, 64, 3), [relu, relu]],
+                [(32, 64, 3), [linear, relu]],
                 [(64, 64, 3), [relu, relu], [bn64, pooling]],
-                [(64, 128, 3), [relu, relu], [bn128, add_postprocessing]],
-                [(1152, 512), [relu, relu]],
+                [(64, 128, 3), [linear, relu], [bn128, add_postprocessing]],
+                [(1152, 512), [linear, relu]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
