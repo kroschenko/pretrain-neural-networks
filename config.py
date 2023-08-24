@@ -66,9 +66,9 @@ add_postprocessing = nn.Flatten()
 unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.2)
 pooling = nn.MaxPool2d(kernel_size=2)
-bn32 = nn.BatchNorm2d(32, affine=False)
-bn64 = nn.BatchNorm2d(64, affine=False)
-bn128 = nn.BatchNorm2d(128, affine=False)
+# bn32 = nn.BatchNorm2d(32, affine=False)
+# bn64 = nn.BatchNorm2d(64, affine=False)
+# bn128 = nn.BatchNorm2d(128, affine=False)
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
@@ -91,11 +91,11 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 32, 3), [sigmoid, relu], [bn32]],
-                [(32, 32, 3), [relu, tanh], [bn32, pooling]],
-                [(32, 64, 3), [tanh, relu], [bn64]],
-                [(64, 64, 3), [relu, tanh], [bn64, pooling]],
-                [(64, 128, 3), [tanh, relu], [bn128, add_postprocessing]],
+                [(3, 32, 3), [sigmoid, relu]],
+                [(32, 32, 3), [relu, tanh], [pooling]],
+                [(32, 64, 3), [tanh, relu]],
+                [(64, 64, 3), [relu, tanh], [pooling]],
+                [(64, 128, 3), [tanh, relu], [add_postprocessing]],
                 [(1152, 512), [relu, tanh]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
