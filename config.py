@@ -64,7 +64,7 @@ softmax = nn.Softmax(dim=1)
 logsoftmax = nn.LogSoftmax(dim=1)
 add_postprocessing = nn.Flatten()
 unflatten = nn.Unflatten(1, (20, 12, 12))
-dropout = nn.Dropout(p=0.2)
+dropout = nn.Dropout(p=0.5)
 pooling = nn.MaxPool2d(kernel_size=2)
 bn32 = nn.BatchNorm2d(32, affine=False).cuda(0)
 bn64 = nn.BatchNorm2d(64, affine=False).cuda(0)
@@ -96,7 +96,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(32, 64, 3), [tanh, relu]],
                 [(64, 64, 3), [relu, tanh], [bn64, pooling]],
                 [(64, 128, 3), [tanh, relu], [bn128, add_postprocessing]],
-                [(1152, 512), [relu, tanh]],
+                [(1152, 512), [relu, tanh], [dropout]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
