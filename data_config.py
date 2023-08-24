@@ -33,6 +33,10 @@ class IrisDataset(Dataset):
 def _flatten(x):
     return torch.flatten(x)
 
+def _normalize(x):
+    mean = torch.mean(x)
+    std = torch.std(x)
+    return (x - mean) / std
 
 transform_MNIST = transforms.Compose(
     [transforms.ToTensor(),
@@ -48,12 +52,14 @@ transform_CIFAR = transforms.Compose(
      ]
 )
 
+
 transform_CIFAR_train = transforms.Compose(
     [
         transforms.ToTensor(),
         # transforms.RandomAffine(25),
+        transforms.Lambda(_normalize),
         transforms.RandomHorizontalFlip(0.5),
-        transforms.RandomCrop((32, 32)),
+        transforms.RandomVerticalFlip(0.5),
         transforms.RandomRotation(15),
     ]
 )
