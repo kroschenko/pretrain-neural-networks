@@ -33,10 +33,12 @@ class IrisDataset(Dataset):
 def _flatten(x):
     return torch.flatten(x)
 
+
 def _normalize(x):
     mean = torch.mean(x)
     std = torch.std(x)
     return (x - mean) / std
+
 
 transform_MNIST = transforms.Compose(
     [transforms.ToTensor(),

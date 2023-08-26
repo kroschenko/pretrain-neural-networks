@@ -7,7 +7,6 @@ from torch import nn
 import torch.optim as optim
 from common_types import PretrainingType, Statistics
 from torch.optim.lr_scheduler import StepLR
-import data_config
 
 
 def get_random_seeds(count):

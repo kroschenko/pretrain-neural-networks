@@ -1,6 +1,5 @@
 import torch
 from torch import nn
-import utilities as utl
 from config import Config
 from models import RBM, CRBM
 from common_types import PretrainingType, LayerTrainType
@@ -16,7 +15,7 @@ class RBMStack:
             layer_params = self.layers[i][0]
             layer_activation_function = self.layers[i][1]
             rbm_constructor = RBM if len(layer_params) == 2 else CRBM
-            rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, with_sampling)
+            rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, with_sampling, device)
             self.rbm_stack.append(rbm.to(self.device))
 
     # def _prepare_train_set(self, train_set, batch_size, input_dim, layer_index=0):
