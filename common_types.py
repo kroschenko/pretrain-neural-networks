@@ -18,6 +18,7 @@ class PretrainingType(enum.Enum):
 class LayerTrainType(enum.Enum):
     PerLayer = 1
     PerBatch = 2
+    PerBatchRandom = 3
 
 
 class InitTypes(enum.Enum):

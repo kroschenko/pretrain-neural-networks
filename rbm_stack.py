@@ -1,3 +1,5 @@
+import random
+
 import torch
 from torch import nn
 from config import Config
@@ -88,7 +90,33 @@ class RBMStack:
 
                         layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
+        if layer_train_type == LayerTrainType.PerBatchRandom:
+            with torch.no_grad():
+                for epoch in range(Config.pretraining_epochs):
+                    loss = 0
+                    for i, data in enumerate(loaders["train_loader"]):
+                        inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
+                        rbm = self.rbm_stack[layer_index]
+                        train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
+                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
+                        # loss += RBMStack.train_rbm_with_batch(rbm, batch, current_pretrain).item()
+                        # self.get_data_for_specific_rbm(data, layer_index)
+                        # batch = data[0].to(self.device)
+                        # for index in range(0, layer_index):
+                        #     batch, _ = self.rbm_stack[index].visible_to_hidden(batch)
+                        #     if len(self.layers[index]) == 3:
+                        #         post_processing_actions = self.layers[index][2]
+                        #         for action in post_processing_actions:
+                        #             if not isinstance(action, torch.nn.Dropout):
+                        #                 batch = action(batch)
 
+                        # if pretrain_type == PretrainingType.Hybrid:
+                        #     current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+                        # else:
+                        #     current_pretrain = pretrain_type
+
+                        layer_index = random.randint(0, len(self.rbm_stack)-1)
+                    print(loss)
         return layers_losses
 
     def torch_model_init_from_weights(self, torch_model):
