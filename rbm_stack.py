@@ -69,7 +69,7 @@ class RBMStack:
                         inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                         rbm = self.rbm_stack[layer_index]
                         train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_beg).item()
+                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
                         # loss += RBMStack.train_rbm_with_batch(rbm, batch, current_pretrain).item()
                         # self.get_data_for_specific_rbm(data, layer_index)
                         # batch = data[0].to(self.device)
