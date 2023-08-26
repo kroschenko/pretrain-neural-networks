@@ -126,7 +126,7 @@ class RBMStack:
         rbm.delta_weights = rbm.delta_weights * momentum + weights_grad
         rbm.delta_v_thresholds = rbm.delta_v_thresholds * momentum + v_thresholds_grad
         rbm.delta_h_thresholds = rbm.delta_h_thresholds * momentum + h_thresholds_grad
-        rbm.W -= rbm.delta_weights
+        rbm.weights -= rbm.delta_weights
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
         part_loss = ((v1 - v0) ** 2).sum()
@@ -167,7 +167,7 @@ class RBMStack:
         rbm.delta_v_thresholds = rbm.delta_v_thresholds * momentum + v_thresholds_grad
         rbm.delta_h_thresholds = rbm.delta_h_thresholds * momentum + h_thresholds_grad
 
-        rbm.W -= rbm.delta_weights
+        rbm.weights -= rbm.delta_weights
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
         part_loss = ((v1 - v0) ** 2).sum()
