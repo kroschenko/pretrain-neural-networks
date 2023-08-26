@@ -130,7 +130,7 @@ class RBMStack:
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
         part_loss = ((v1 - v0) ** 2).sum()
-        return part_loss, h0
+        return part_loss
 
     @staticmethod
     def train_crbm_from_batch(rbm, batch, pretrain_type, momentum):
