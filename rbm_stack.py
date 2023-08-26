@@ -65,7 +65,7 @@ class RBMStack:
             with torch.no_grad():
                 for epoch in range(Config.pretraining_epochs):
                     loss = 0
-                    for i, data in enumerate(loaders[0]):
+                    for i, data in enumerate(loaders["train_loader"]):
                         inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                         rbm = self.rbm_stack[layer_index]
                         train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
