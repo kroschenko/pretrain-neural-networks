@@ -92,7 +92,7 @@ class RBMStack:
                 inputs = self.get_data_for_specific_rbm(data[0].to(device), layer_index)
                 loss += train_from_batch_func(rbm, inputs, pretrain_type, momentum)
             losses.append(loss)
-            print(loss)
+            print(loss.item())
             # if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
             #     val_loader = loaders["val_loader"]
             #     val_loss = utl.test_rbm(rbm, val_loader, device)
