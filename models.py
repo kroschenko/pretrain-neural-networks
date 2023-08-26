@@ -33,6 +33,12 @@ class UnifiedClassifier(nn.Module):
 
 
 class RBMBase(nn.Module, ABC):
+    def __init__(self, device):
+        super(RBMBase, self).__init__()
+        self.delta_weights = torch.zeros(self.W.shape).to(device)
+        self.delta_v_thresholds = torch.zeros(self.v.shape).to(device)
+        self.delta_h_thresholds = torch.zeros(self.h.shape).to(device)
+
     def forward(self, v0):
         h0, h0_ws = self.visible_to_hidden(v0)
         if self.with_sampling:
@@ -46,8 +52,8 @@ class RBMBase(nn.Module, ABC):
 
 
 class RBM(RBMBase):
-    def __init__(self, n_vis, n_hid, a_func, init_type, with_sampling):
-        super(RBM, self).__init__()
+    def __init__(self, n_vis, n_hid, a_func, init_type, with_sampling, device):
+        super(RBM, self).__init__(device)
         if init_type == InitTypes.Kaiming:
             weights = torch.empty(n_vis, n_hid)
             v = torch.empty(1, n_vis)
@@ -85,8 +91,8 @@ class RBM(RBMBase):
 
 
 class CRBM(RBMBase):
-    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, with_sampling):
-        super(CRBM, self).__init__()
+    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, with_sampling, device):
+        super(CRBM, self).__init__(device)
         if init_type == InitTypes.Kaiming:
             weights = torch.empty(n_hid_channels, n_vis_channels, kernel_size, kernel_size)
             torch.nn.init.kaiming_normal_(weights, nonlinearity="relu")
