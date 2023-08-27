@@ -34,7 +34,7 @@ class Conditions:
 # )
 
 DATASETS = [DatasetType.CIFAR10]
-include_pretraining_types = [PretrainingType.Hybrid]
+include_pretraining_types = [PretrainingType.Without]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 for dataset in DATASETS:
     current_experiment_dataset_name = dataset

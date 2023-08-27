@@ -20,35 +20,6 @@ class RBMStack:
             rbm = rbm_constructor(*layer_params, layer_activation_function, init_type, with_sampling, device)
             self.rbm_stack.append(rbm.to(self.device))
 
-    # def _prepare_train_set(self, train_set, batch_size, input_dim, layer_index=0):
-    #     batches_count = len(train_set) / batch_size
-    #     if isinstance(input_dim, tuple):
-    #         resulted_array = torch.zeros((train_set.shape[0], *input_dim))
-    #     else:
-    #         resulted_array = torch.zeros((train_set.shape[0], input_dim))
-    #     i = 0
-    #     while i < batches_count:
-    #         _slice = slice(i * batch_size, (i + 1) * batch_size)
-    #         inputs = train_set[_slice]
-    #         if layer_index == 0:
-    #             resulted_array[_slice] = inputs
-    #         else:
-    #             inputs = inputs.to(self.device)
-    #             v0, v1, v1_ws, h0, h0_ws, h1, h1_ws = self.rbm_stack[layer_index - 1](inputs)
-    #             resulted_array[_slice] = h0
-    #         i += 1
-    #     if len(self.layers[layer_index - 1]) == 3:
-    #         post_processing_actions = self.layers[layer_index - 1][2]
-    #         for action in post_processing_actions:
-    #             if not isinstance(action, torch.nn.Dropout):
-    #                 resulted_array = action(resulted_array)
-    #     return resulted_array
-
-    # def train_rbm_with_batch(rbm, batch, pretrain_type):
-    #     train_func = batch_train_rbm if isinstance(rbm, RBM) else batch_train_crbm
-    #     losses, _ = train_func(rbm, batch, pretrain_type, Config.momentum_beg)
-    #     return losses
-
     def train(self, loaders, pretrain_type, layer_train_type):
         layers_losses = {}
         layer_index = 0
@@ -205,10 +176,6 @@ class RBMStack:
             #     print("val_loss" + str(val_loss))
             epoch += 1
         return losses
-
-    def train_rbm_per_batch(self, loaders, device, rbm, pretrain_type, layer_index):
-        train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-
 
     def do_reduction(self, layers_config):
         with torch.no_grad():
