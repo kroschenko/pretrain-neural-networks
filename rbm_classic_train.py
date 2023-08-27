@@ -33,16 +33,14 @@ class Conditions:
 #     api_token=ProjectConfig.api_token
 # )
 
-DATASETS = [DatasetType.CIFAR10]
-include_pretraining_types = [PretrainingType.RBMClassic]
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-for dataset in DATASETS:
+for dataset in Config.DATASETS:
     current_experiment_dataset_name = dataset
     meta_data = data_config.get_data_loaders(current_experiment_dataset_name, Config.pretraining_batch_size)
     random_seeds, layers_variants = get_experiment_params(current_experiment_dataset_name)
     conditions = "undefined_"
     pretraining_types = list(PretrainingType)
-    for pretraining_type in include_pretraining_types:
+    for pretraining_type in Config.include_pretraining_types:
         print(pretraining_type)
         for layers_config in layers_variants:
             stat = Statistics()
