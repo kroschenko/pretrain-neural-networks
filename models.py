@@ -89,7 +89,7 @@ class RBM(RBMBase):
 
 
 class CRBM(RBMBase):
-    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, a_func, init_type, with_sampling, device):
+    def __init__(self, n_vis_channels, n_hid_channels, kernel_size, same_size, a_func, init_type, with_sampling, device):
         super(CRBM, self).__init__()
         if init_type == InitTypes.Kaiming:
             weights = torch.empty(n_hid_channels, n_vis_channels, kernel_size, kernel_size)
@@ -110,11 +110,12 @@ class CRBM(RBMBase):
         self.delta_weights = torch.zeros(self.weights.shape).to(device)
         self.delta_v_thresholds = torch.zeros(self.v.shape).to(device)
         self.delta_h_thresholds = torch.zeros(self.h.shape).to(device)
+        self.padding = [1, 1] if same_size else [0, 0]
 
     def visible_to_hidden(self, v):
         weighted_sum = torch.convolution(
             v, self.weights, None, stride=[1, 1],
-            padding=[0, 0], dilation=[1, 1], transposed=False,
+            padding=self.padding, dilation=[1, 1], transposed=False,
             output_padding=[0, 0], groups=1
         )
         output = self.a_func[1](weighted_sum+self.h)
@@ -122,7 +123,7 @@ class CRBM(RBMBase):
 
     def hidden_to_visible(self, h):
         weighted_sum = torch.conv_transpose2d(
-            h, self.weights, None, stride=[1, 1], padding=[0, 0], output_padding=[0, 0], groups=1, dilation=[1, 1]
+            h, self.weights, None, stride=[1, 1], padding=self.padding, output_padding=[0, 0], groups=1, dilation=[1, 1]
         )
         output = self.a_func[0](weighted_sum+self.v)
         return output, weighted_sum
