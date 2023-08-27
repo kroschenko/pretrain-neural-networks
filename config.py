@@ -70,6 +70,7 @@ pooling = nn.MaxPool2d(kernel_size=2)
 bn32 = nn.BatchNorm2d(32, affine=False).cuda(0)
 bn64 = nn.BatchNorm2d(64, affine=False).cuda(0)
 bn128 = nn.BatchNorm2d(128, affine=False).cuda(0)
+bn_fc = nn.BatchNorm1d(512, affine=False).cuda(0)
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
@@ -97,7 +98,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(32, 64, 3), [tanh, relu]],
                 [(64, 64, 3), [relu, tanh], [bn64, pooling]],
                 [(64, 128, 3), [tanh, relu], [bn128, add_postprocessing]],
-                [(1152, 512), [relu, tanh]],
+                [(1152, 512), [relu, tanh], [bn_fc]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
