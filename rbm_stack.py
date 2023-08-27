@@ -72,22 +72,6 @@ class RBMStack:
                         rbm = self.rbm_stack[layer_index]
                         train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
                         loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
-                        # loss += RBMStack.train_rbm_with_batch(rbm, batch, current_pretrain).item()
-                        # self.get_data_for_specific_rbm(data, layer_index)
-                        # batch = data[0].to(self.device)
-                        # for index in range(0, layer_index):
-                        #     batch, _ = self.rbm_stack[index].visible_to_hidden(batch)
-                        #     if len(self.layers[index]) == 3:
-                        #         post_processing_actions = self.layers[index][2]
-                        #         for action in post_processing_actions:
-                        #             if not isinstance(action, torch.nn.Dropout):
-                        #                 batch = action(batch)
-
-                        # if pretrain_type == PretrainingType.Hybrid:
-                        #     current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
-                        # else:
-                        #     current_pretrain = pretrain_type
-
                         layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
         if layer_train_type == LayerTrainType.PerBatchRandom:
@@ -99,22 +83,6 @@ class RBMStack:
                         rbm = self.rbm_stack[layer_index]
                         train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
                         loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
-                        # loss += RBMStack.train_rbm_with_batch(rbm, batch, current_pretrain).item()
-                        # self.get_data_for_specific_rbm(data, layer_index)
-                        # batch = data[0].to(self.device)
-                        # for index in range(0, layer_index):
-                        #     batch, _ = self.rbm_stack[index].visible_to_hidden(batch)
-                        #     if len(self.layers[index]) == 3:
-                        #         post_processing_actions = self.layers[index][2]
-                        #         for action in post_processing_actions:
-                        #             if not isinstance(action, torch.nn.Dropout):
-                        #                 batch = action(batch)
-
-                        # if pretrain_type == PretrainingType.Hybrid:
-                        #     current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
-                        # else:
-                        #     current_pretrain = pretrain_type
-
                         layer_index = random.randint(0, len(self.rbm_stack)-1)
                     print(loss)
         return layers_losses
@@ -128,31 +96,6 @@ class RBMStack:
                 if len(torch_model.layers_config[i][0]) == 3:
                     torch_model.layers[i].weight.data = self.rbm_stack[i].weights
                     torch_model.layers[i].bias.data = self.rbm_stack[i].h.reshape(torch_model.layers[i].bias.data.shape)
-
-    # def train_rbm(self, rbm, device, loaders, layer_index, train_from_batch_func, pretrain_type):
-    #     losses = []
-    #     val_fail_counter = 0
-    #     early_stop = False
-    #     prev_val_loss = 1e100
-    #     epoch = 0
-    #     train_loader = loaders["train_loader"]
-    #     while not early_stop and epoch < Config.pretraining_epochs:
-    #         loss = 0
-    #         momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
-    #         for i, data in enumerate(train_loader):
-    #             inputs = self.get_data_for_specific_rbm(data[0].to(device), layer_index)
-    #             loss += train_from_batch_func(rbm, inputs, pretrain_type, momentum).item()
-    #         losses.append(loss)
-    #         print(loss)
-            # if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
-            #     val_loader = loaders["val_loader"]
-            #     val_loss = utl.test_rbm(rbm, val_loader, device)
-            #     val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
-            #     if val_fail_counter == Config.validation_decay:
-            #         early_stop = True
-            #     print("val_loss" + str(val_loss))
-            # epoch += 1
-        # return losses
 
     @staticmethod
     def train_rbm_from_batch(rbm, batch, pretrain_type, momentum):
