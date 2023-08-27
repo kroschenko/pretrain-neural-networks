@@ -95,6 +95,7 @@ class RBMStack:
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
         part_loss = ((v1 - v0) ** 2).sum()
+        print(h0.shape)
         return part_loss
 
     @staticmethod
@@ -136,6 +137,7 @@ class RBMStack:
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
         part_loss = ((v1 - v0) ** 2).sum()
+        print(h0.shape)
         return part_loss
 
     def get_data_for_specific_rbm(self, original_data, layer_index):
