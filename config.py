@@ -54,7 +54,7 @@ class Config:
     validate_every_epochs = 1
     validation_decay = 3
     test_batch_size = 128
-    include_pretraining_types = [PretrainingType.RBMClassic]
+    include_pretraining_types = [PretrainingType.Without]
     DATASETS = [DatasetType.CIFAR10]
 
 
