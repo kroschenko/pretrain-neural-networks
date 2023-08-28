@@ -54,7 +54,7 @@ class Config:
     validate_every_epochs = 1
     validation_decay = 3
     test_batch_size = 128
-    include_pretraining_types = [PretrainingType.REBA]
+    include_pretraining_types = [PretrainingType.Without]
     DATASETS = [DatasetType.CIFAR10]
 
 
@@ -96,12 +96,12 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         DatasetType.CIFAR10: [
             {"architecture": [
                 [(3, 32, 3, True), [sigmoid, relu], [bn32]],
-                [(32, 32, 3, True), [relu, relu], [bn32, pooling, dropout_conv]],
-                [(32, 64, 3, True), [relu, relu], [bn64]],
-                [(64, 64, 3, True), [relu, relu], [bn64, pooling, dropout_conv]],
-                [(64, 128, 3, True), [relu, relu], [bn128]],
-                [(128, 128, 3, True), [relu, relu], [bn128, pooling, dropout_conv, add_postprocessing]],
-                [(2048, 512), [relu, relu], [bn_fc, dropout]],
+                [(32, 32, 3, True), [relu, tanh], [bn32, pooling, dropout_conv]],
+                [(32, 64, 3, True), [tanh, relu], [bn64]],
+                [(64, 64, 3, True), [relu, tanh], [bn64, pooling, dropout_conv]],
+                [(64, 128, 3, True), [tanh, relu], [bn128]],
+                [(128, 128, 3, True), [relu, tanh], [bn128, pooling, dropout_conv, add_postprocessing]],
+                [(2048, 512), [tanh, relu], [bn_fc, dropout]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
