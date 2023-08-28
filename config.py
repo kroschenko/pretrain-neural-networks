@@ -95,7 +95,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 32, 3, True), [relu, relu], [bn32]],
+                [(3, 32, 3, True), [linear, relu], [bn32]],
                 [(32, 32, 3, True), [relu, relu], [bn32, pooling, dropout_conv]],
                 [(32, 64, 3, True), [relu, relu], [bn64]],
                 [(64, 64, 3, True), [relu, relu], [bn64, pooling, dropout_conv]],
