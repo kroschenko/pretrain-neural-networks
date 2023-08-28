@@ -57,6 +57,7 @@ transform_CIFAR = transforms.Compose(
 
 transform_CIFAR_train = transforms.Compose(
     [
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
         transforms.RandomRotation(15),
         transforms.RandomHorizontalFlip(0.5),
         transforms.RandomVerticalFlip(0.5),
@@ -70,6 +71,7 @@ transform_CIFAR_train = transforms.Compose(
 
 transform_COMMON = transforms.Compose(
     [
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
         transforms.ToTensor(),
     ]
 )
