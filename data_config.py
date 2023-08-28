@@ -57,10 +57,11 @@ transform_CIFAR = transforms.Compose(
 
 transform_CIFAR_train = transforms.Compose(
     [
-        transforms.RandomRotation(15),
-        transforms.RandomHorizontalFlip(0.5),
+        transforms.RandAugment(),
+        # transforms.RandomRotation(15),
+        # transforms.RandomHorizontalFlip(0.5),
         transforms.ToTensor(),
-        # transforms.RandAugment(),
+        #
         # transforms.RandomHorizontalFlip(0.5),
         # transforms.RandomVerticalFlip(0.5),
         # transforms.RandomRotation(15),
@@ -108,7 +109,7 @@ def get_data_loaders(dataset_type, batch_size):
             train_set, val_set = torch.utils.data.random_split(
                 train_set, [int(len(train_set.data) * config.Config.validation_split_value), val_size])
             val_set.dataset.transform = transform_COMMON
-            # train_set.dataset.transform = transform
+            train_set.dataset.transform = transform
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
         val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=False) if config.Config.use_validation_dataset else None
