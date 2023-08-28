@@ -16,8 +16,9 @@ class UnifiedClassifier(nn.Module):
             new_layer = None
             if len(layer[0]) == 2:
                 new_layer = nn.Linear(*layer[0])
-            if len(layer[0]) == 3:
-                new_layer = nn.Conv2d(*layer[0])
+            if len(layer[0]) == 4:
+                padding = 1 if layer[0][-1] else 0
+                new_layer = nn.Conv2d(*layer[0][0:3], padding=padding)
             self.layers.append(new_layer)
             self.a_functions.append(layer[1][-1])
             layer_index += 1
