@@ -58,7 +58,7 @@ transform_CIFAR = transforms.Compose(
 transform_CIFAR_train = transforms.Compose(
     [
         transforms.ToTensor(),
-        transforms.RandAugment(),
+        # transforms.RandAugment(),
         # transforms.RandomHorizontalFlip(0.5),
         # transforms.RandomVerticalFlip(0.5),
         # transforms.RandomRotation(15),
