@@ -34,7 +34,7 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 10
+    pretraining_epochs = 60
     pretraining_rate = 0.000125  # 0.00002 # 0.001   0.00001 - MNIST
     pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
 
@@ -48,7 +48,7 @@ class Config:
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
-    layer_train_type = LayerTrainType.PerLayer
+    layer_train_type = LayerTrainType.PerBatch
     use_validation_dataset = True
     validation_split_value = 0.9
     validate_every_epochs = 1
