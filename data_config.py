@@ -60,7 +60,7 @@ transform_CIFAR_train = transforms.Compose(
         transforms.ToTensor(),
         # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
         transforms.RandomHorizontalFlip(0.5),
-        transforms.RandomAffine(degrees=0, translate=(5, 5)),
+        transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
         transforms.RandomRotation(15),
         #
         # transforms.RandomHorizontalFlip(0.5),
