@@ -59,6 +59,7 @@ class Config:
 
 
 relu = nn.ReLU()
+rrelu = nn.RReLU()
 linear = Linear()
 sigmoid = nn.Sigmoid()
 tanh = nn.Tanh()
@@ -95,13 +96,13 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 32, 3, True), [sigmoid, relu], [bn32]],
-                [(32, 32, 3, True), [relu, relu], [bn32, pooling, dropout_conv]],
-                [(32, 64, 3, True), [relu, relu], [bn64]],
-                [(64, 64, 3, True), [relu, relu], [bn64, pooling, dropout_conv]],
-                [(64, 128, 3, True), [relu, relu], [bn128]],
-                [(128, 128, 3, True), [relu, relu], [bn128, pooling, dropout_conv, add_postprocessing]],
-                [(2048, 512), [relu, relu], [bn_fc, dropout]],
+                [(3, 32, 3, True), [sigmoid, rrelu], [bn32]],
+                [(32, 32, 3, True), [rrelu, rrelu], [bn32, pooling, dropout_conv]],
+                [(32, 64, 3, True), [rrelu, rrelu], [bn64]],
+                [(64, 64, 3, True), [rrelu, rrelu], [bn64, pooling, dropout_conv]],
+                [(64, 128, 3, True), [rrelu, rrelu], [bn128]],
+                [(128, 128, 3, True), [rrelu, rrelu], [bn128, pooling, dropout_conv, add_postprocessing]],
+                [(2048, 512), [rrelu, rrelu], [bn_fc, dropout]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ],
