@@ -34,12 +34,12 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 60
+    pretraining_epochs = 1
     pretraining_rate = 0.000125  # 0.00002 # 0.001   0.00001 - MNIST
     pretraining_rate_reba = 0.000125  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
-    max_finetuning_epochs = 100
+    max_finetuning_epochs = 10
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -48,7 +48,7 @@ class Config:
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
-    layer_train_type = LayerTrainType.PerBatchRandom
+    layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = True
     validation_split_value = 0.9
     validate_every_epochs = 1
@@ -74,6 +74,7 @@ bn32 = nn.BatchNorm2d(32, affine=False).cuda(0)
 bn64 = nn.BatchNorm2d(64, affine=False).cuda(0)
 bn128 = nn.BatchNorm2d(128, affine=False).cuda(0)
 bn_fc = nn.BatchNorm1d(512, affine=False).cuda(0)
+freeze_pretrained_layers = True
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
