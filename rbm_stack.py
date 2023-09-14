@@ -67,6 +67,8 @@ class RBMStack:
             if len(torch_model.layers_config[i][0]) == 3:
                 torch_model.layers[i].weight.data = self.rbm_stack[i].weights
                 torch_model.layers[i].bias.data = self.rbm_stack[i].h.reshape(torch_model.layers[i].bias.data.shape)
+            torch_model.layers[i].weight.requires_grad = False
+            torch_model.layers[i].bias.requires_grad = False
 
     @staticmethod
     def train_rbm_from_batch(rbm, batch, pretrain_type, momentum):

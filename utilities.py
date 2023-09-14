@@ -95,7 +95,7 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     # optimizer = optim.SGD(
     # classifier.parameters(), lr=config.finetune_rate, momentum=config.fine_tuning_momentum, weight_decay=1e-6
     # )
-    optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6, betas=(0.9, 0.999), eps=1e-08)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, classifier.parameters()), lr=Config.finetune_rate, weight_decay=1e-6, betas=(0.9, 0.999), eps=1e-08)
     # scheduler = StepLR(optimizer, 5, 0.1)
     # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
     best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device)
