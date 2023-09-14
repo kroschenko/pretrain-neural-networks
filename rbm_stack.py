@@ -59,14 +59,14 @@ class RBMStack:
         return layers_losses
 
     def torch_model_init_from_weights(self, torch_model):
-        with torch.no_grad():
-            for i in range(0, len(torch_model.layers) - 1):
-                if len(torch_model.layers_config[i][0]) == 2:
-                    torch_model.layers[i].weight.data = self.rbm_stack[i].weights.T
-                    torch_model.layers[i].bias.data = torch.reshape(self.rbm_stack[i].h, (len(self.rbm_stack[i].h[0]),))
-                if len(torch_model.layers_config[i][0]) == 3:
-                    torch_model.layers[i].weight.data = self.rbm_stack[i].weights
-                    torch_model.layers[i].bias.data = self.rbm_stack[i].h.reshape(torch_model.layers[i].bias.data.shape)
+        # with torch.no_grad():
+        for i in range(0, len(torch_model.layers) - 1):
+            if len(torch_model.layers_config[i][0]) == 2:
+                torch_model.layers[i].weight.data = self.rbm_stack[i].weights.T
+                torch_model.layers[i].bias.data = torch.reshape(self.rbm_stack[i].h, (len(self.rbm_stack[i].h[0]),))
+            if len(torch_model.layers_config[i][0]) == 3:
+                torch_model.layers[i].weight.data = self.rbm_stack[i].weights
+                torch_model.layers[i].bias.data = self.rbm_stack[i].h.reshape(torch_model.layers[i].bias.data.shape)
 
     @staticmethod
     def train_rbm_from_batch(rbm, batch, pretrain_type, momentum):
