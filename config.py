@@ -54,6 +54,7 @@ class Config:
     validate_every_epochs = 1
     validation_decay = 3
     test_batch_size = 128
+    freeze_pretrained_layers = True
     include_pretraining_types = [PretrainingType.Hybrid]
     DATASETS = [DatasetType.CIFAR10]
 
@@ -74,7 +75,6 @@ bn32 = nn.BatchNorm2d(32, affine=False).cuda(0)
 bn64 = nn.BatchNorm2d(64, affine=False).cuda(0)
 bn128 = nn.BatchNorm2d(128, affine=False).cuda(0)
 bn_fc = nn.BatchNorm1d(512, affine=False).cuda(0)
-freeze_pretrained_layers = True
 
 
 def get_layers_config_for_dataset(experiment_dataset_name):
