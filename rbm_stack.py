@@ -38,12 +38,15 @@ class RBMStack:
             with torch.no_grad():
                 for epoch in range(Config.pretraining_epochs):
                     loss = 0
-                    for i, data in enumerate(loaders["train_loader"]):
-                        inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
-                        rbm = self.rbm_stack[layer_index]
-                        train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
-                        layer_index = (layer_index + 1) % len(self.rbm_stack)
+                    for _, data in enumerate(loaders["train_loader"]):
+                        inputs = data[0].to(self.device)
+                        for layer_index in (0, len(self.rbm_stack)):
+                        # inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
+                            rbm = self.rbm_stack[layer_index]
+                            train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
+                            loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
+                            inputs = rbm(inputs)
+                        # layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
         if layer_train_type == LayerTrainType.PerBatchRandom:
             with torch.no_grad():
