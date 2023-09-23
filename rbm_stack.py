@@ -47,6 +47,7 @@ class RBMStack:
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
                             loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
                             inputs = rbm(inputs)
+                            print(inputs.shape)
                         # layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
         if layer_train_type == LayerTrainType.PerBatchRandom:
