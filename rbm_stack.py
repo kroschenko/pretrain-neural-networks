@@ -40,7 +40,7 @@ class RBMStack:
                     loss = 0
                     for _, data in enumerate(loaders["train_loader"]):
                         inputs = data[0].to(self.device)
-                        for layer_index in (0, len(self.rbm_stack)):
+                        for layer_index in (0, len(self.rbm_stack)-1):
                         # inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                             rbm = self.rbm_stack[layer_index]
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
