@@ -41,12 +41,12 @@ class RBMStack:
                     for i, data in enumerate(loaders["train_loader"]):
                         inputs = data[0].to(self.device)
                         print(inputs.shape)
-                        for layer_index in (0, len(self.rbm_stack)-1):
+                        for layer_index in (0, len(self.rbm_stack)):
                         # inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                             rbm = self.rbm_stack[layer_index]
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
                             loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
-                            inputs = rbm(inputs)
+                            inputs, _ = rbm.visible_to_hidden(inputs)
                             print(inputs.shape)
                         # layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
