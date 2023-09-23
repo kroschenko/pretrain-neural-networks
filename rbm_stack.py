@@ -2,6 +2,8 @@ import random
 
 import torch
 from torch import nn
+
+import config
 from config import Config
 from models import RBM, CRBM
 from common_types import PretrainingType, LayerTrainType
@@ -36,14 +38,17 @@ class RBMStack:
                     layer_index += 1
         if layer_train_type == LayerTrainType.PerBatch:
             with torch.no_grad():
+                momentum = Config.momentum_beg
                 for epoch in range(Config.pretraining_epochs*len(self.rbm_stack)):
                     loss = 0
+                    if epoch == Config.momentum_change_epoch:
+                        momentum = Config.momentum_end
                     for i, data in enumerate(loaders["train_loader"]):
                         inputs = data[0].to(self.device)
                         for layer_index in range(0, len(self.rbm_stack)):
                             rbm = self.rbm_stack[layer_index]
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-                            loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
+                            loss += train_from_batch_func(rbm, inputs, current_pretrain, momentum).item()
                             inputs, _ = rbm.visible_to_hidden(inputs)
                             if len(self.layers[layer_index]) == 3:
                                 post_processing_actions = self.layers[layer_index][2]
@@ -61,7 +66,7 @@ class RBMStack:
                         inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                         rbm = self.rbm_stack[layer_index]
                         train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
+                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end, momentum).item()
                         layer_index = random.randint(0, len(self.rbm_stack)-1)
                     print(loss)
         return layers_losses
