@@ -46,7 +46,14 @@ class RBMStack:
                             rbm = self.rbm_stack[layer_index]
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
                             loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end).item()
-                            inputs, _ = rbm.visible_to_hidden(inputs)
+                            # inputs, _ = rbm.visible_to_hidden(inputs)
+                            data, _ = rbm.visible_to_hidden(data)
+                            if len(self.layers[layer_index]) == 3:
+                                post_processing_actions = self.layers[layer_index][2]
+                                for action in post_processing_actions:
+                                    if not isinstance(action, torch.nn.Dropout) and not isinstance(action,
+                                                                                               torch.nn.BatchNorm2d):
+                                        data = action(data)
                             print(inputs.shape)
                         # layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
