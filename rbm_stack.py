@@ -40,6 +40,7 @@ class RBMStack:
                     loss = 0
                     for i, data in enumerate(loaders["train_loader"]):
                         inputs = data[0].to(self.device)
+                        print(inputs.shape)
                         for layer_index in (0, len(self.rbm_stack)-1):
                         # inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                             rbm = self.rbm_stack[layer_index]
