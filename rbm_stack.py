@@ -38,7 +38,7 @@ class RBMStack:
             with torch.no_grad():
                 for epoch in range(Config.pretraining_epochs):
                     loss = 0
-                    for _, data in enumerate(loaders["train_loader"]):
+                    for i, data in enumerate(loaders["train_loader"]):
                         inputs = data[0].to(self.device)
                         for layer_index in (0, len(self.rbm_stack)-1):
                         # inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
