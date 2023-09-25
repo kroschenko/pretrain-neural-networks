@@ -38,7 +38,7 @@ class Config:
     pretraining_rate = 0.0001  # 0.00002 # 0.001   0.00001 - MNIST
     pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
-    finetune_rate = 0.001
+    finetune_rate = 0.0001
     max_finetuning_epochs = 10
     finetuning_momentum = 0.9
     test_every_epochs = 1
