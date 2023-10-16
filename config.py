@@ -39,7 +39,7 @@ class Config:
     pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.0001
-    max_finetuning_epochs = 100
+    max_finetuning_epochs = 1
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -57,6 +57,7 @@ class Config:
     freeze_pretrained_layers = True
     include_pretraining_types = [PretrainingType.RBMClassic]
     DATASETS = [DatasetType.MNIST]
+    calc_shap = True
 
 
 relu = nn.ReLU()

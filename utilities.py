@@ -1,4 +1,8 @@
 import random
+
+import config
+import shap
+import numpy as np
 from config import Config
 import torch
 from rbm_stack import RBMStack
@@ -99,5 +103,18 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     # scheduler = StepLR(optimizer, 5, 0.1)
     # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
     best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device)
+    if Config.calc_shap:
+        batch = next(iter(loaders["test_loader"]))
+        images, _ = batch
+
+        background = images[:100].to(device)
+        test_images = images[100:105].to(device)
+
+        e = shap.DeepExplainer(classifier, background)
+        shap_values = e.shap_values(test_images)
+
+        shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_values]
+        test_numpy = np.swapaxes(np.swapaxes(test_images.cpu().numpy(), 1, -1), 1, 2)
+        shap.image_plot(shap_numpy, -test_numpy)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
