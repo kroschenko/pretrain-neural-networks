@@ -49,7 +49,7 @@ class Config:
     with_adaptive_rate = False
     reduction_param = 0.01
     layer_train_type = LayerTrainType.PerBatch
-    use_validation_dataset = True
+    use_validation_dataset = False
     validation_split_value = 0.9
     validate_every_epochs = 1
     validation_decay = 3
