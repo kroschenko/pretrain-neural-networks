@@ -48,7 +48,7 @@ class Config:
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
-    layer_train_type = LayerTrainType.PerBatch
+    layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = False
     validation_split_value = 0.9
     validate_every_epochs = 1
@@ -88,8 +88,8 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
             {"architecture": [
-                [(1, 40, 5), [sigmoid, relu], [pooling]],
-                [(40, 40, 5), [relu, relu], [pooling, add_postprocessing]],
+                [(1, 40, 5, False), [sigmoid, relu], [pooling]],
+                [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
                 [(640, 320), [relu, relu]],
                 [(320, 160), [relu, relu]],
                 [(160, 10), [logsoftmax]],
