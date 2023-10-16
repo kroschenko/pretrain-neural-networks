@@ -6,6 +6,7 @@ class DatasetType(enum.Enum):
     CIFAR10 = 2
     CIFAR100 = 3
     IRIS = 4
+    FashionMNIST = 5
 
 
 class PretrainingType(enum.Enum):
