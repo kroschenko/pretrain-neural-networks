@@ -2,6 +2,7 @@ import torch.nn as nn
 from torch.nn.modules.module import Module, Tensor
 from common_types import DatasetType, InitTypes, LayerTrainType, PretrainingType
 from dataclasses import dataclass
+import torch
 
 
 @dataclass
@@ -68,6 +69,7 @@ tanh = nn.Tanh()
 softmax = nn.Softmax(dim=1)
 logsoftmax = nn.LogSoftmax(dim=1)
 add_postprocessing = nn.Flatten()
+flatten_variant = torch.view(-1, 320)
 unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.5)
 dropout_conv = nn.Dropout2d(p=0)
@@ -90,7 +92,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             # ], "input_dim": 784},
             {"architecture": [
                 [(1, 40, 5, False), [sigmoid, relu], [pooling]],
-                [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
+                [(40, 40, 5, False), [relu, relu], [pooling, flatten_variant]],
                 [(640, 320), [relu, relu]],
                 [(320, 160), [relu, relu]],
                 [(160, 10), [softmax]],
