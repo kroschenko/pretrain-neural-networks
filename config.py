@@ -56,7 +56,7 @@ class Config:
     test_batch_size = 128
     freeze_pretrained_layers = True
     include_pretraining_types = [PretrainingType.RBMClassic]
-    DATASETS = [DatasetType.MNIST]
+    DATASETS = [DatasetType.CIFAR10]
 
 
 relu = nn.ReLU()
