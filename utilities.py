@@ -94,7 +94,7 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
 
-    criterion = nn.NLLLoss()
+    criterion = nn.BCELoss()
     # criterion = nn.CrossEntropyLoss(reduction="sum")
     # optimizer = optim.SGD(
     # classifier.parameters(), lr=config.finetune_rate, momentum=config.fine_tuning_momentum, weight_decay=1e-6
