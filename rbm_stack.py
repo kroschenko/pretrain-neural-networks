@@ -50,6 +50,10 @@ class RBMStack:
                     for i, data in enumerate(loaders["train_loader"]):
                         inputs = data[0].to(self.device)
                         for layer_index in range(0, len(self.rbm_stack)):
+                            if pretrain_type == PretrainingType.Hybrid:
+                                current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+                            else:
+                                current_pretrain = pretrain_type
                             rbm = self.rbm_stack[layer_index]
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
                             loss += train_from_batch_func(rbm, inputs, current_pretrain, momentum).item()
