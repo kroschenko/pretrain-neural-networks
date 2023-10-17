@@ -2,7 +2,6 @@ import torch.nn as nn
 from torch.nn.modules.module import Module, Tensor
 from common_types import DatasetType, InitTypes, LayerTrainType, PretrainingType
 from dataclasses import dataclass
-import torch
 
 
 @dataclass
@@ -35,12 +34,12 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 10
+    pretraining_epochs = 1
     pretraining_rate = 0.0001  # 0.00002 # 0.001   0.00001 - MNIST
     pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.0001
-    max_finetuning_epochs = 1
+    max_finetuning_epochs = 10
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -56,9 +55,9 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = True
-    include_pretraining_types = [PretrainingType.RBMClassic]
+    include_pretraining_types = [PretrainingType.Without]
     DATASETS = [DatasetType.MNIST]
-    calc_shap = True
+    calc_shap = False
 
 
 relu = nn.ReLU()
@@ -69,7 +68,6 @@ tanh = nn.Tanh()
 softmax = nn.Softmax(dim=1)
 logsoftmax = nn.LogSoftmax(dim=1)
 add_postprocessing = nn.Flatten()
-flatten_variant = torch.view(-1, 320)
 unflatten = nn.Unflatten(1, (20, 12, 12))
 dropout = nn.Dropout(p=0.5)
 dropout_conv = nn.Dropout2d(p=0)
@@ -92,7 +90,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             # ], "input_dim": 784},
             {"architecture": [
                 [(1, 40, 5, False), [sigmoid, relu], [pooling]],
-                [(40, 40, 5, False), [relu, relu], [pooling, flatten_variant]],
+                [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
                 [(640, 320), [relu, relu]],
                 [(320, 160), [relu, relu]],
                 [(160, 10), [softmax]],

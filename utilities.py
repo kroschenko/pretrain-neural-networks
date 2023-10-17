@@ -66,6 +66,7 @@ def train_torch_model(model, loaders, optimizer, criterion, device):
                 early_stop = True
             prev_val_loss = val_loss
             print("val loss = " + str(val_loss.item()) + " val_accuracy = " + str(current_accuracy))
+        print(running_loss)
         losses.append(running_loss)
         epoch += 1
     return best_total_accuracy, losses
@@ -105,6 +106,7 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
     best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device)
     if Config.calc_shap:
+        classifier.eval()
         batch = next(iter(loaders["test_loader"]))
         images, _ = batch
 
