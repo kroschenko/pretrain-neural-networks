@@ -80,7 +80,8 @@ def get_dataset_constructor(dataset_type: DatasetType):
     dataset_selector = {
         DatasetType.MNIST: datasets.MNIST,
         DatasetType.CIFAR10: datasets.CIFAR10,
-        DatasetType.CIFAR100: datasets.CIFAR100
+        DatasetType.CIFAR100: datasets.CIFAR100,
+        DatasetType.FashionMNIST: datasets.FashionMNIST,
     }
     return dataset_selector[dataset_type]
 
@@ -91,6 +92,7 @@ def get_data_loaders(dataset_type, batch_size):
         DatasetType.MNIST: transform_MNIST,
         DatasetType.CIFAR10: transform_CIFAR_train,
         DatasetType.CIFAR100: transform_CIFAR_train,
+        DatasetType.FashionMNIST: transform_MNIST,
     }
     if dataset_type == DatasetType.IRIS:
         train_set = IrisDataset("./data/fisher_irises/iris_train.txt")
