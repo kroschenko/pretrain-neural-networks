@@ -34,7 +34,7 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 1
+    pretraining_epochs = 10
     pretraining_rate = 0.0001  # 0.00002 # 0.001   0.00001 - MNIST
     pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
@@ -88,12 +88,22 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 800), relu],
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
+            # {"architecture": [
+            #     [(1, 40, 5, False), [sigmoid, relu], [pooling]],
+            #     [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
+            #     [(640, 320), [relu, relu]],
+            #     [(320, 160), [relu, relu]],
+            #     [(160, 10), [softmax]],
+            # ], "input_dim": (1, 28, 28)},
             {"architecture": [
-                [(1, 40, 5, False), [sigmoid, relu], [pooling]],
-                [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
-                [(640, 320), [relu, relu]],
-                [(320, 160), [relu, relu]],
-                [(160, 10), [softmax]],
+                [(1, 32, 3, True), [relu, relu], [bn32]],
+                [(32, 32, 3, True), [relu, relu], [bn32, pooling, dropout_conv]],
+                [(32, 64, 3, True), [relu, relu], [bn64]],
+                [(64, 64, 3, True), [relu, relu], [bn64, pooling, dropout_conv]],
+                [(64, 128, 3, False), [relu, relu], [bn128]],
+                [(128, 128, 3, False), [relu, relu], [bn128, dropout_conv, add_postprocessing]],
+                [(1152, 512), [relu, relu], [bn_fc, dropout]],
+                [(512, 10), [softmax]],
             ], "input_dim": (1, 28, 28)},
         ],
         DatasetType.CIFAR10: [
