@@ -25,13 +25,17 @@ class RBMStack:
     def train(self, loaders, pretrain_type, layer_train_type):
         layers_losses = {}
         layer_index = 0
-        if pretrain_type == PretrainingType.Hybrid:
-            current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
-        else:
-            current_pretrain = pretrain_type
+        # if pretrain_type == PretrainingType.Hybrid:
+        #     current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+        # else:
+        #     current_pretrain = pretrain_type
         if layer_train_type == LayerTrainType.PerLayer:
             with torch.no_grad():
                 for rbm, layer in zip(self.rbm_stack, self.layers):
+                    if pretrain_type == PretrainingType.Hybrid:
+                        current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
+                    else:
+                        current_pretrain = pretrain_type
                     print(current_pretrain)
                     # layers_losses["layer_"+str(layer_index)], \
                     self.train_rbm_per_layer(loaders, self.device, rbm, current_pretrain, layer_index)
