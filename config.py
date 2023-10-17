@@ -55,7 +55,7 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.Without]
+    include_pretraining_types = [PretrainingType.Hybrid]
     DATASETS = [DatasetType.MNIST]
     calc_shap = False
 
