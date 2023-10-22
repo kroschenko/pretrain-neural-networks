@@ -25,19 +25,14 @@ class RBMStack:
     def train(self, loaders, pretrain_type, layer_train_type):
         layers_losses = {}
         layer_index = 0
-        # if pretrain_type == PretrainingType.Hybrid:
-        #     current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
-        # else:
-        #     current_pretrain = pretrain_type
         if layer_train_type == LayerTrainType.PerLayer:
             with torch.no_grad():
-                for rbm, layer in zip(self.rbm_stack, self.layers):
+                for rbm in self.rbm_stack:
                     if pretrain_type == PretrainingType.Hybrid:
                         current_pretrain = PretrainingType.RBMClassic if layer_index == 0 else PretrainingType.REBA
                     else:
                         current_pretrain = pretrain_type
                     print(current_pretrain)
-                    # layers_losses["layer_"+str(layer_index)], \
                     self.train_rbm_per_layer(loaders, self.device, rbm, current_pretrain, layer_index)
                     layer_index += 1
         if layer_train_type == LayerTrainType.PerBatch:
@@ -74,7 +69,7 @@ class RBMStack:
                         inputs = self.get_data_for_specific_rbm(data[0].to(self.device), layer_index)
                         rbm = self.rbm_stack[layer_index]
                         train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-                        loss += train_from_batch_func(rbm, inputs, current_pretrain, Config.momentum_end, momentum).item()
+                        loss += train_from_batch_func(rbm, inputs, current_pretrain, momentum).item()
                         layer_index = random.randint(0, len(self.rbm_stack)-1)
                     print(loss)
         return layers_losses
