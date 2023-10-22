@@ -51,7 +51,8 @@ class RBMStack:
                                 current_pretrain = pretrain_type
                             rbm = self.rbm_stack[layer_index]
                             train_from_batch_func = self.train_rbm_from_batch if isinstance(rbm, RBM) else self.train_crbm_from_batch
-                            loss += train_from_batch_func(rbm, inputs, current_pretrain, momentum).item()
+                            vis_loss, hid_loss = train_from_batch_func(rbm, inputs, current_pretrain, momentum).item()
+                            loss += vis_loss + hid_loss
                             inputs, _ = rbm.visible_to_hidden(inputs)
                             if len(self.layers[layer_index]) == 3:
                                 post_processing_actions = self.layers[layer_index][2]
@@ -184,7 +185,8 @@ class RBMStack:
             momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
             for i, data in enumerate(train_loader):
                 inputs = self.get_data_for_specific_rbm(data[0].to(device), layer_index)
-                loss += train_from_batch_func(rbm, inputs, pretrain_type, momentum).item()
+                vis_loss, hid_loss = train_from_batch_func(rbm, inputs, pretrain_type, momentum).item()
+                loss += vis_loss + hid_loss
             losses.append(loss)
             print(loss)
             # if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
