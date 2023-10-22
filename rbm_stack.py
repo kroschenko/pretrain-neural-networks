@@ -210,8 +210,8 @@ class RBMStack:
         with torch.no_grad():
             for i, data in enumerate(val_loader):
                 inputs = self.get_data_for_specific_rbm(data[0].to(device), layer_index)
-                v0, v1, _, _, _, _, _ = rbm_model(inputs)
-                test_loss += ((v1 - v0) ** 2).sum().item()
+                v0, v1, _, h0, _, h1, _ = rbm_model(inputs)
+                test_loss += ((v1 - v0) ** 2).sum().item() + ((h1 - h0) ** 2).sum().item()
         return test_loss
 
     def do_reduction(self, layers_config):
