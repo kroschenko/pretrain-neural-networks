@@ -192,7 +192,7 @@ class RBMStack:
                 loss += vis_loss.item() + hid_loss.item()
             losses.append(loss)
             print(loss)
-            if math.abs(prev_loss - loss) < 1e-3:
+            if math.fabs(prev_loss - loss) < 1e-3:
                 early_stop = True
             prev_loss = loss
             if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
