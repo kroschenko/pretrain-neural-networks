@@ -20,16 +20,6 @@ def get_random_seeds(count):
     return seeds
 
 
-def test_rbm(rbm_model, val_loader, device):
-    test_loss = 0
-    with torch.no_grad():
-        for i, data in enumerate(val_loader):
-            inputs = data[0].to(device)
-            v0, v1, _, _, _, _, _ = rbm_model(inputs)
-            test_loss += ((v1 - v0) ** 2).sum().item()
-    return test_loss
-
-
 def train_torch_model(model, loaders, optimizer, criterion, device):
     best_total_accuracy = 0
     losses = []
