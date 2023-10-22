@@ -35,6 +35,7 @@ class RBMStack:
                     print(current_pretrain)
                     self.train_rbm_per_layer(loaders, self.device, rbm, current_pretrain, layer_index)
                     layer_index += 1
+                    Config.pretraining_rate *= 0.1
         if layer_train_type == LayerTrainType.PerBatch:
             with torch.no_grad():
                 momentum = Config.momentum_beg
