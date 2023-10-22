@@ -57,7 +57,6 @@ class Config:
     freeze_pretrained_layers = False
     include_pretraining_types = [PretrainingType.Hybrid]
     DATASETS = [DatasetType.MNIST]
-    calc_shap = False
 
 
 relu = nn.ReLU()
