@@ -202,6 +202,7 @@ class RBMStack:
                 if val_fail_counter == Config.validation_decay:
                     early_stop = True
                 print("val_loss " + str(val_loss))
+                prev_val_loss = val_loss
             epoch += 1
         return losses
 
