@@ -48,14 +48,14 @@ class Config:
     with_reduction = False
     with_adaptive_rate = False
     reduction_param = 0.01
-    layer_train_type = LayerTrainType.PerBatch
+    layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = False
     validation_split_value = 0.9
     validate_every_epochs = 1
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.Without]
+    include_pretraining_types = [PretrainingType.RBMClassic]
     DATASETS = [DatasetType.MNIST]
 
 

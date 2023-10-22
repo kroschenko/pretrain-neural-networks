@@ -35,7 +35,6 @@ class RBMStack:
                     print(current_pretrain)
                     self.train_rbm_per_layer(loaders, self.device, rbm, current_pretrain, layer_index)
                     layer_index += 1
-                    Config.pretraining_rate *= 0.1
         if layer_train_type == LayerTrainType.PerBatch:
             with torch.no_grad():
                 momentum = Config.momentum_beg
@@ -113,8 +112,9 @@ class RBMStack:
         rbm.weights -= rbm.delta_weights
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
-        part_loss = ((v1 - v0) ** 2).sum()
-        return part_loss
+        vis_part_loss = ((v1 - v0) ** 2).sum()
+        hid_part_loss = ((h1 - h0) ** 2).sum()
+        return vis_part_loss, hid_part_loss
 
     @staticmethod
     def train_crbm_from_batch(rbm, batch, pretrain_type, momentum):
@@ -154,8 +154,9 @@ class RBMStack:
         rbm.weights -= rbm.delta_weights
         rbm.v -= rbm.delta_v_thresholds
         rbm.h -= rbm.delta_h_thresholds
-        part_loss = ((v1 - v0) ** 2).sum()
-        return part_loss
+        vis_part_loss = ((v1 - v0) ** 2).sum()
+        hid_part_loss = ((h1 - h0) ** 2).sum()
+        return vis_part_loss, hid_part_loss
 
     def get_data_for_specific_rbm(self, original_data, layer_index):
         current_layer_index = 0
