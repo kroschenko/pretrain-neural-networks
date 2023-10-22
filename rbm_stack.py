@@ -2,6 +2,7 @@ import random
 
 import torch
 from torch import nn
+import math
 import utilities as utl
 
 import config
@@ -181,6 +182,7 @@ class RBMStack:
         prev_val_loss = 1e100
         epoch = 0
         train_loader = loaders["train_loader"]
+        prev_loss = 1e100
         while not early_stop and epoch < Config.pretraining_epochs:
             loss = 0
             momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
@@ -190,6 +192,9 @@ class RBMStack:
                 loss += vis_loss.item() + hid_loss.item()
             losses.append(loss)
             print(loss)
+            if math.abs(prev_loss - loss) < 1e-3:
+                early_stop = True
+            prev_loss = loss
             if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
                 val_loader = loaders["val_loader"]
                 val_loss = self.test_rbm(rbm, val_loader, device, layer_index)
