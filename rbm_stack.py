@@ -183,7 +183,8 @@ class RBMStack:
         epoch = 0
         train_loader = loaders["train_loader"]
         prev_loss = 1e100
-        while not early_stop: #and epoch < Config.pretraining_epochs:
+        while epoch < Config.pretraining_epochs:
+        # while not early_stop: #and epoch < Config.pretraining_epochs:
             loss = 0
             momentum = Config.momentum_beg if epoch < Config.momentum_change_epoch else Config.momentum_end
             for i, data in enumerate(train_loader):
