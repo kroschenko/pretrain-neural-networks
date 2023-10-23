@@ -34,12 +34,12 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 10
-    pretraining_rate = 0.0005  # 0.00002 # 0.001   0.00001 - MNIST
+    pretraining_epochs = 30
+    pretraining_rate = 0.000125  # 0.00002 # 0.001   0.00001 - MNIST
     # pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
-    finetune_rate = 0.0001
-    max_finetuning_epochs = 10
+    finetune_rate = 0.001
+    max_finetuning_epochs = 50
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -49,13 +49,13 @@ class Config:
     with_adaptive_rate = False
     reduction_param = 0.01
     layer_train_type = LayerTrainType.PerLayer
-    use_validation_dataset = True
+    use_validation_dataset = False
     validation_split_value = 0.9
     validate_every_epochs = 1
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.RBMClassic]
+    include_pretraining_types = [PretrainingType.Without]
     DATASETS = [DatasetType.MNIST]
 
 
@@ -87,23 +87,23 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 800), relu],
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
-            # {"architecture": [
-            #     [(1, 40, 5, False), [sigmoid, relu], [pooling]],
-            #     [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
-            #     [(640, 320), [relu, relu]],
-            #     [(320, 160), [relu, relu]],
-            #     [(160, 10), [softmax]],
-            # ], "input_dim": (1, 28, 28)},
             {"architecture": [
-                [(1, 32, 3, True), [relu, tanh]],
-                [(32, 32, 3, True), [tanh, relu], [pooling, dropout_conv]],
-                [(32, 64, 3, True), [relu, tanh]],
-                [(64, 64, 3, True), [tanh, relu], [pooling, dropout_conv]],
-                [(64, 128, 3, False), [relu, tanh]],
-                [(128, 128, 3, False), [tanh, relu], [dropout_conv, add_postprocessing]],
-                [(1152, 512), [relu, tanh], [dropout]],
-                [(512, 10), [softmax]],
+                [(1, 40, 5, False), [sigmoid, relu], [pooling]],
+                [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
+                [(640, 320), [relu, relu]],
+                [(320, 160), [relu, relu]],
+                [(160, 10), [softmax]],
             ], "input_dim": (1, 28, 28)},
+            # {"architecture": [
+            #     [(1, 32, 3, True), [relu, tanh]],
+            #     [(32, 32, 3, True), [tanh, relu], [pooling, dropout_conv]],
+            #     [(32, 64, 3, True), [relu, tanh]],
+            #     [(64, 64, 3, True), [tanh, relu], [pooling, dropout_conv]],
+            #     [(64, 128, 3, False), [relu, tanh]],
+            #     [(128, 128, 3, False), [tanh, relu], [dropout_conv, add_postprocessing]],
+            #     [(1152, 512), [relu, tanh], [dropout]],
+            #     [(512, 10), [softmax]],
+            # ], "input_dim": (1, 28, 28)},
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
