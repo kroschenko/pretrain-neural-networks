@@ -20,7 +20,7 @@ def get_random_seeds(count):
     return seeds
 
 
-def train_torch_model(model, loaders, optimizer, criterion, device, scheduler):
+def train_torch_model(model, loaders, optimizer, criterion, device):
     best_total_accuracy = 0
     losses = []
     train_loader = loaders["train_loader"]
@@ -43,7 +43,7 @@ def train_torch_model(model, loaders, optimizer, criterion, device, scheduler):
             optimizer.step()
 
             running_loss += loss.item()
-        scheduler.step()
+        # scheduler.step()
         if epoch % Config.test_every_epochs == 0:
             current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
             if current_accuracy > best_total_accuracy:
@@ -91,8 +91,8 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
         classifier.parameters(), lr=Config.finetune_rate, momentum=Config.finetuning_momentum, weight_decay=1e-6
     )
     # optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
-    scheduler = StepLR(optimizer, 10, 0.5)
+    # scheduler = StepLR(optimizer, 10, 0.5)
     # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
-    best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device, scheduler)
+    best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
