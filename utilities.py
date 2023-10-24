@@ -38,7 +38,7 @@ def train_torch_model(model, loaders, optimizer, criterion, device, scheduler):
             optimizer.zero_grad()
 
             outputs = model(inputs)
-            loss = F.nll_loss(outputs.log(), labels)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
@@ -68,7 +68,7 @@ def test_torch_model(model, test_loader, criterion, device):
         for data in test_loader:
             images, labels = data[0].to(device), data[1].to(device)
             outputs = model(images)
-            test_loss += F.nll_loss(outputs.log(), labels)
+            test_loss += criterion(outputs, labels)
             _, predictions = torch.max(outputs, 1)
             correct_answers += (predictions == labels).sum()
     return 100 * float(correct_answers) / len(test_loader.dataset), test_loss
