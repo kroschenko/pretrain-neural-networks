@@ -92,7 +92,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
                 [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
                 [(640, 320), [relu, relu]],
                 [(320, 160), [relu, relu]],
-                [(160, 10), [softmax]],
+                [(160, 10), [logsoftmax]],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 32, 3, True), [relu, tanh]],
