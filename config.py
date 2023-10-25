@@ -55,7 +55,7 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.RBMClassic]
+    include_pretraining_types = [PretrainingType.Without]
     DATASETS = [DatasetType.MNIST]
 
 
@@ -88,11 +88,11 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
             {"architecture": [
-                [(1, 32, 5, False), [sigmoid, relu], [pooling]],
-                [(32, 16, 5, False), [relu, relu], [pooling, add_postprocessing]],
-                [(256, 128), [relu, relu]],
+                [(1, 16, 5, False), [sigmoid, relu], [pooling]],
+                [(16, 8, 5, False), [relu, relu], [pooling, add_postprocessing]],
                 [(128, 64), [relu, relu]],
-                [(64, 10), [logsoftmax]],
+                [(64, 32), [relu, relu]],
+                [(32, 10), [logsoftmax]],
             ], "input_dim": (1, 28, 28)},
             # {"architecture": [
             #     [(1, 32, 3, True), [relu, tanh]],
