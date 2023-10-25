@@ -40,13 +40,8 @@ def _normalize(x):
     return (x - mean) / std
 
 
-def _symmetric_transform(x):
-    return 2 * x - 1
-
-
 transform_MNIST = transforms.Compose(
     [transforms.ToTensor(),
-     transforms.Lambda(_symmetric_transform),
      # transforms.Lambda(_flatten)
      ]
 )
@@ -76,7 +71,6 @@ transform_CIFAR_train = transforms.Compose(
 transform_COMMON = transforms.Compose(
     [
         transforms.ToTensor(),
-        transforms.Lambda(_symmetric_transform),
         # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
     ]
 )
