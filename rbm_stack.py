@@ -227,14 +227,14 @@ class RBMStack:
             condition = None
             for i in range(0, len(self.layers) - 1):
                 if condition is not None:
-                    self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition])
+                    self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
                 print(self.rbm_stack[i].weights.shape)
                 condition = torch.abs(self.rbm_stack[i].weights).sum(dim=2).sum(dim=2).sum(dim=1) != 0
                 print(condition.shape)
                 print(condition)
                 removed_columns_indices = torch.where(~condition)[0]
                 print(removed_columns_indices)
-                self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition, :, :])
+                self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition])
                 # self.rbm_stack[i].h = nn.Parameter(self.rbm_stack[i].h[:, condition])
                 # layers_config["architecture"][i][0] = tuple(self.rbm_stack[i].weights.shape)
             # previous_neurons_count = layers_config["architecture"][len(self.layers)-2][0][1]
