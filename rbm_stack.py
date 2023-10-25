@@ -229,7 +229,10 @@ class RBMStack:
                 if condition is not None:
                     self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
                 print(self.rbm_stack[i].weights.shape)
-                condition = torch.abs(self.rbm_stack[i].weights).sum(dim=2).sum(dim=2).sum(dim=1) != 0
+                if len(self.rbm_stack[i].weights.shape) > 2:
+                    condition = torch.abs(self.rbm_stack[i].weights).sum(dim=2).sum(dim=2).sum(dim=1) != 0
+                else:
+                    condition = torch.abs(self.rbm_stack[i].weights).sum(dim=1) != 0
                 print(condition.shape)
                 print(condition)
                 removed_columns_indices = torch.where(~condition)[0]
