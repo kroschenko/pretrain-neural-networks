@@ -221,8 +221,8 @@ class RBMStack:
             for i in range(0, len(self.layers) - 1):
                 mask = torch.abs(self.rbm_stack[i].weights) > Config.reduction_param
                 print(mask.shape)
-                reduction_params_count = (~mask).sum() * 100. / mask.numel()
-                print(reduction_params_count)
+                reduction_params_percent = (~mask).sum() * 100. / mask.numel()
+                print(reduction_params_percent)
                 self.rbm_stack[i].weights *= mask.double()
             condition = None
             for i in range(0, len(self.layers) - 1):
@@ -231,7 +231,8 @@ class RBMStack:
                 print(self.rbm_stack[i].weights.shape)
                 condition = torch.abs(self.rbm_stack[i].weights).sum(dim=2).sum(dim=2) != 0
                 print(condition.shape)
-                # removed_columns_indices = torch.where(~condition)[0]
+                removed_columns_indices = torch.where(~condition)[0]
+                print(removed_columns_indices)
                 # self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
                 # self.rbm_stack[i].h = nn.Parameter(self.rbm_stack[i].h[:, condition])
                 # layers_config["architecture"][i][0] = tuple(self.rbm_stack[i].weights.shape)
