@@ -88,7 +88,7 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             #     [(800, 10), logsoftmax]
             # ], "input_dim": 784},
             {"architecture": [
-                [(1, 40, 5, False), [sigmoid, relu], [pooling]],
+                [(1, 40, 5, False), [tanh, relu], [pooling]],
                 [(40, 40, 5, False), [relu, relu], [pooling, add_postprocessing]],
                 [(640, 320), [relu, relu]],
                 [(320, 160), [relu, relu]],
