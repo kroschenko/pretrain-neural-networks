@@ -234,7 +234,7 @@ class RBMStack:
                 print(condition)
                 removed_columns_indices = torch.where(~condition)[0]
                 print(removed_columns_indices)
-                self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition])
+                self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
                 # self.rbm_stack[i].h = nn.Parameter(self.rbm_stack[i].h[:, condition])
                 # layers_config["architecture"][i][0] = tuple(self.rbm_stack[i].weights.shape)
             # previous_neurons_count = layers_config["architecture"][len(self.layers)-2][0][1]
