@@ -34,12 +34,12 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 10
+    pretraining_epochs = 30
     pretraining_rate = 0.0001  # 0.00002 # 0.001   0.00001 - MNIST
     # pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
-    max_finetuning_epochs = 50
+    max_finetuning_epochs = 25
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -55,8 +55,8 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.RBMClassic]
-    DATASETS = [DatasetType.CIFAR100]
+    include_pretraining_types = [PretrainingType.Without]
+    DATASETS = [DatasetType.CIFAR10]
 
 
 relu = nn.ReLU()
@@ -107,15 +107,22 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 32, 3, True), [relu, relu], [bn32]],
-                [(32, 32, 3, True), [relu, relu], [bn32, pooling, dropout_conv]],
-                [(32, 64, 3, True), [relu, relu], [bn64]],
-                [(64, 64, 3, True), [relu, relu], [bn64, pooling, dropout_conv]],
-                [(64, 128, 3, True), [relu, relu], [bn128]],
-                [(128, 128, 3, True), [relu, relu], [bn128, pooling, dropout_conv, add_postprocessing]],
-                [(2048, 512), [relu, relu], [bn_fc, dropout]],
+                [(3, 128, 5, False), [sigmoid, relu], [pooling]],
+                [(128, 64, 5, False), [relu, tanh], [pooling, add_postprocessing]],
+                [(1600, 1024), [tanh, relu]],
+                [(1024, 512), [relu, tanh]],
                 [(512, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
+            # {"architecture": [
+            #     [(3, 32, 3, True), [relu, relu], [bn32]],
+            #     [(32, 32, 3, True), [relu, relu], [bn32, pooling, dropout_conv]],
+            #     [(32, 64, 3, True), [relu, relu], [bn64]],
+            #     [(64, 64, 3, True), [relu, relu], [bn64, pooling, dropout_conv]],
+            #     [(64, 128, 3, True), [relu, relu], [bn128]],
+            #     [(128, 128, 3, True), [relu, relu], [bn128, pooling, dropout_conv, add_postprocessing]],
+            #     [(2048, 512), [relu, relu], [bn_fc, dropout]],
+            #     [(512, 10), [logsoftmax]],
+            # ], "input_dim": (3, 32, 32)},
         ],
         DatasetType.CIFAR100: [
             {"architecture": [
