@@ -40,6 +40,10 @@ def _normalize(x):
     return (x - mean) / std
 
 
+def _function(x):
+    return 2 * x - 1
+
+
 transform_MNIST = transforms.Compose(
     [transforms.ToTensor(),
      # transforms.Lambda(_flatten)
@@ -50,7 +54,7 @@ transform_MNIST = transforms.Compose(
 transform_CIFAR = transforms.Compose(
     [transforms.ToTensor(),
      # transforms.RandomRotation(5),
-     # transforms.Lambda(_flatten)
+     transforms.Lambda(_function)
      ]
 )
 
@@ -58,6 +62,7 @@ transform_CIFAR = transforms.Compose(
 transform_CIFAR_train = transforms.Compose(
     [
         transforms.ToTensor(),
+        transforms.Lambda(_function),
         # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
         # transforms.RandomHorizontalFlip(0.5),
         # transforms.RandomAffine(degrees=15, translate=(0.1, 0.1)),
@@ -71,6 +76,7 @@ transform_CIFAR_train = transforms.Compose(
 transform_COMMON = transforms.Compose(
     [
         transforms.ToTensor(),
+        transforms.Lambda(_function),
         # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
     ]
 )

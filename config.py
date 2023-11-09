@@ -34,8 +34,8 @@ class Config:
     momentum_beg = 0.5
     momentum_end = 0.9
     momentum_change_epoch = 5
-    pretraining_epochs = 30
-    pretraining_rate = 0.0001  # 0.00002 # 0.001   0.00001 - MNIST
+    pretraining_epochs = 10
+    pretraining_rate = 0.000125  # 0.00002 # 0.001   0.00001 - MNIST
     # pretraining_rate_reba = 0.0001  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
@@ -55,7 +55,7 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.Without]
+    include_pretraining_types = [PretrainingType.RBMClassic, PretrainingType.REBA]
     DATASETS = [DatasetType.CIFAR10]
 
 
@@ -107,11 +107,10 @@ def get_layers_config_for_dataset(experiment_dataset_name):
         ],
         DatasetType.CIFAR10: [
             {"architecture": [
-                [(3, 128, 5, False), [sigmoid, relu], [pooling]],
-                [(128, 64, 5, False), [relu, tanh], [pooling, add_postprocessing]],
-                [(1600, 1024), [tanh, relu]],
-                [(1024, 512), [relu, tanh]],
-                [(512, 10), [logsoftmax]],
+                [(3, 64, 5, False), [tanh, relu], [pooling]],
+                [(64, 32, 5, False), [relu, tanh], [pooling, add_postprocessing]],
+                [(800, 128), [tanh, relu]],
+                [(128, 10), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
             # {"architecture": [
             #     [(3, 32, 3, True), [relu, relu], [bn32]],
