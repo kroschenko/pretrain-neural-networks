@@ -99,7 +99,7 @@ class RBMStack:
         elif pretrain_type == PretrainingType.REBA:
             der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
             der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
-            rate = Config.pretraining_rate
+            rate = Config.pretraining_rate_reba
         if Config.with_adaptive_rate:
             b_h = h0 * ((v1 * v0).sum() + 1) - h1 * (1 + (v1 * v1).sum())
             b_v = v0 * (1 + (h0 * h0).sum()) - v1 * (1 + (h0 * h1).sum())
@@ -129,7 +129,7 @@ class RBMStack:
         if pretrain_type == PretrainingType.REBA:
             der_v = (act_func[0](v1_ws + 0.00001) - act_func[0](v1_ws - 0.00001)) / 0.00002
             der_h = (act_func[1](h1_ws + 0.00001) - act_func[1](h1_ws - 0.00001)) / 0.00002
-            rate = Config.pretraining_rate
+            rate = Config.pretraining_rate_reba
         part_v = (v1 - v0) * der_v
         part_h = (h1 - h0) * der_h
         first_convolution_part = torch.convolution(
