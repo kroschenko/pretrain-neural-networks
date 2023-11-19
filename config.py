@@ -39,7 +39,7 @@ class Config:
     pretraining_rate_reba = 0.00025  # 0.00002 # 0.001  0.00004 - MNIST
 
     finetune_rate = 0.001
-    max_finetuning_epochs = 25
+    max_finetuning_epochs = 15
     finetuning_momentum = 0.9
     test_every_epochs = 1
     count_attempts_in_experiment = 1
@@ -55,7 +55,7 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.RBMClassic, PretrainingType.REBA]
+    include_pretraining_types = [PretrainingType.Hybrid, PretrainingType.Without, PretrainingType.RBMClassic, PretrainingType.REBA]
     DATASETS = [DatasetType.CIFAR10]
 
 

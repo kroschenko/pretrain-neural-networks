@@ -59,8 +59,7 @@ class RBMStack:
                             if len(self.layers[layer_index]) == 3:
                                 post_processing_actions = self.layers[layer_index][2]
                                 for action in post_processing_actions:
-                                    if not isinstance(action, torch.nn.Dropout) and not isinstance(action,
-                                                                                               torch.nn.BatchNorm2d):
+                                    if not isinstance(action, torch.nn.Dropout):
                                         inputs = action(inputs)
                         # layer_index = (layer_index + 1) % len(self.rbm_stack)
                     print(loss)
@@ -169,7 +168,7 @@ class RBMStack:
             if len(self.layers[current_layer_index]) == 3:
                 post_processing_actions = self.layers[current_layer_index][2]
                 for action in post_processing_actions:
-                    if not isinstance(action, torch.nn.Dropout) and not isinstance(action, torch.nn.BatchNorm2d):
+                    if not isinstance(action, torch.nn.Dropout):
                         data = action(data)
             current_layer_index += 1
         return data
