@@ -83,7 +83,7 @@ class RBMStack:
             if len(torch_model.layers_config[i][0]) == 2:
                 torch_model.layers[i].weight.data = self.rbm_stack[i].weights.T
                 torch_model.layers[i].bias.data = torch.reshape(self.rbm_stack[i].h, (len(self.rbm_stack[i].h[0]),))
-            if len(torch_model.layers_config[i][0]) == 3:
+            if len(torch_model.layers_config[i][0]) >= 3:
                 torch_model.layers[i].weight.data = self.rbm_stack[i].weights
                 torch_model.layers[i].bias.data = self.rbm_stack[i].h.reshape(torch_model.layers[i].bias.data.shape)
             # torch_model.layers[i].weight.requires_grad = False
