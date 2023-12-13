@@ -68,6 +68,7 @@ def zeroing_parameters(model, masks):
         for layer_num in range(0, len(masks)):
             model.layers[layer_num].weight *= masks[layer_num]
             print(model.layers[layer_num].weight.shape)
+            print(masks[layer_num].shape)
     # for name, param in model.named_parameters():
 
         # print(name, param.size())
