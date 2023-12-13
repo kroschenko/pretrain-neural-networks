@@ -45,9 +45,9 @@ class Config:
     count_attempts_in_experiment = 1
     init_type = InitTypes.SimpleNormal
     with_sampling = False
-    with_reduction = False
+    with_reduction = True
     with_adaptive_rate = False
-    reduction_param = 0.01
+    reduction_param = 0.001
     layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = False
     validation_split_value = 0.9
