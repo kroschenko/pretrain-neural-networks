@@ -64,9 +64,10 @@ def train_torch_model(model, loaders, optimizer, criterion, device, masks=None):
 
 
 def zeroing_parameters(model, masks):
-    for layer_num in range(0, len(masks)):
-        model.layers[layer_num].weight *= masks[layer_num]
-        print(model.layers[layer_num].weight.shape)
+    with torch.no_grad():
+        for layer_num in range(0, len(masks)):
+            model.layers[layer_num].weight *= masks[layer_num]
+            print(model.layers[layer_num].weight.shape)
     # for name, param in model.named_parameters():
 
         # print(name, param.size())
