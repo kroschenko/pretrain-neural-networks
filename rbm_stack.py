@@ -225,6 +225,8 @@ class RBMStack:
                 reduction_params_percent = (~mask).sum() * 100. / mask.numel()
                 print(reduction_params_percent)
                 self.rbm_stack[i].weights *= mask.double()
+                if len(mask.shape) == 2:
+                    mask = mask.T
                 masks.append(mask)
         return masks
             # condition = None
