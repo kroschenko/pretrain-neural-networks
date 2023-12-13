@@ -55,7 +55,7 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    pretraining_schemes = [[PretrainingType.RBMClassic, True], [PretrainingType.RBMClassic, False]]
+    pretraining_schemes = [[PretrainingType.RBMClassic, True], [PretrainingType.Without, False]]
     DATASETS = [DatasetType.CIFAR10]
 
 
