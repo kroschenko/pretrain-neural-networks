@@ -87,13 +87,13 @@ def test_torch_model(model, test_loader, criterion, device):
     return 100 * float(correct_answers) / len(test_loader.dataset), test_loss
 
 
-def run_experiment(layers_config, pretrain_type, loaders, device, init_type, without_sampling):
+def run_experiment(layers_config, pretrain_type, loaders, device, init_type, without_sampling, with_reduction):
     rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
     masks = None
     if pretrain_type != PretrainingType.Without:
         layers_losses = rbm_stack.train(loaders, pretrain_type, layer_train_type=Config.layer_train_type)
-        if Config.with_reduction:
+        if with_reduction:
             masks = rbm_stack.do_reduction(layers_config)
     # print(len(masks))
     classifier = UnifiedClassifier(layers_config).to(device)

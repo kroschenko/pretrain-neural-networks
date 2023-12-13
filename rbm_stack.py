@@ -220,7 +220,7 @@ class RBMStack:
         masks = []
         with torch.no_grad():
             for i in range(0, len(self.layers) - 1):
-                mask = torch.abs(self.rbm_stack[i].weights) > Config.reduction_param
+                mask = torch.abs(self.rbm_stack[i].weights) > 0.001
                 print(mask.shape)
                 reduction_params_percent = (~mask).sum() * 100. / mask.numel()
                 print(reduction_params_percent)

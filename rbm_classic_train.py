@@ -40,7 +40,8 @@ for dataset in Config.DATASETS:
     random_seeds, layers_variants = get_experiment_params(current_experiment_dataset_name)
     conditions = "undefined_"
     pretraining_types = list(PretrainingType)
-    for pretraining_type in Config.include_pretraining_types:
+    for pretraining_scheme in Config.pretraining_schemes:
+        pretraining_type, with_reduction = pretraining_scheme
         print(pretraining_type)
         for layers_config in layers_variants:
             stat = Statistics()
@@ -48,7 +49,7 @@ for dataset in Config.DATASETS:
                 conditions = Conditions(layers_config, pretraining_type, dataset)
                 torch.random.manual_seed(random_seeds[attempt_index])
                 statistics, losses = utl.run_experiment(
-                    layers_config, pretraining_type, meta_data, device, Config.init_type, Config.with_sampling
+                    layers_config, pretraining_type, meta_data, device, Config.init_type, Config.with_sampling, with_reduction
                 )
                 # figure, ax = plt.subplots(1, 1, figsize=(10, 10))
                 print(losses)

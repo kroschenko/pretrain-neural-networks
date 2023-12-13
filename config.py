@@ -45,9 +45,9 @@ class Config:
     count_attempts_in_experiment = 1
     init_type = InitTypes.SimpleNormal
     with_sampling = False
-    with_reduction = False
+    # with_reduction = False
     with_adaptive_rate = False
-    reduction_param = 0.001
+    # reduction_param = 0.001
     layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = False
     validation_split_value = 0.9
@@ -55,7 +55,7 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    include_pretraining_types = [PretrainingType.RBMClassic]
+    pretraining_schemes = [[PretrainingType.RBMClassic, True], [PretrainingType.RBMClassic, False]]
     DATASETS = [DatasetType.CIFAR10]
 
 
