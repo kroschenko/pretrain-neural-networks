@@ -222,7 +222,7 @@ class RBMStack:
             for i in range(0, len(self.layers) - 1):
                 pruning_param = torch.std(self.rbm_stack[i].weights)
                 print(pruning_param)
-                mask = torch.abs(self.rbm_stack[i].weights) > 0.001
+                mask = torch.abs(self.rbm_stack[i].weights) > pruning_param * 0.1
                 print(mask.shape)
                 reduction_params_percent = (~mask).sum() * 100. / mask.numel()
                 print(reduction_params_percent)
