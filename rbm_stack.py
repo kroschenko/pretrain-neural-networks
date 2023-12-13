@@ -217,6 +217,7 @@ class RBMStack:
         return test_loss
 
     def do_reduction(self, layers_config):
+        masks = []
         with torch.no_grad():
             for i in range(0, len(self.layers) - 1):
                 mask = torch.abs(self.rbm_stack[i].weights) > Config.reduction_param
@@ -224,21 +225,22 @@ class RBMStack:
                 reduction_params_percent = (~mask).sum() * 100. / mask.numel()
                 print(reduction_params_percent)
                 self.rbm_stack[i].weights *= mask.double()
-            condition = None
-            for i in range(0, len(self.layers) - 1):
-                if condition is not None:
-                    self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
-                print(self.rbm_stack[i].weights.shape)
-                if len(self.rbm_stack[i].weights.shape) > 2:
-                    condition = torch.abs(self.rbm_stack[i].weights).sum(dim=2).sum(dim=2).sum(dim=1) != 0
-                else:
-                    condition = torch.abs(self.rbm_stack[i].weights).sum(dim=1) != 0
-                print(condition.shape)
-                print(condition)
-                removed_columns_indices = torch.where(~condition)[0]
-                print(removed_columns_indices)
-                self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition])
-                self.rbm_stack[i].h = nn.Parameter(self.rbm_stack[i].h[:, condition])
+                masks.append(mask)
+            # condition = None
+            # for i in range(0, len(self.layers) - 1):
+            #     if condition is not None:
+            #         self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[:, condition])
+            #     print(self.rbm_stack[i].weights.shape)
+            #     if len(self.rbm_stack[i].weights.shape) > 2:
+            #         condition = torch.abs(self.rbm_stack[i].weights).sum(dim=2).sum(dim=2).sum(dim=1) != 0
+            #     else:
+            #         condition = torch.abs(self.rbm_stack[i].weights).sum(dim=1) != 0
+            #     print(condition.shape)
+            #     print(condition)
+            #     removed_columns_indices = torch.where(~condition)[0]
+            #     print(removed_columns_indices)
+            #     self.rbm_stack[i].weights = nn.Parameter(self.rbm_stack[i].weights[condition])
+            #     self.rbm_stack[i].h = nn.Parameter(self.rbm_stack[i].h[:, condition])
                 # layers_config["architecture"][i][0] = tuple(self.rbm_stack[i].weights.shape)
             # previous_neurons_count = layers_config["architecture"][len(self.layers)-2][0][1]
             # end_layer_neurons_count = layers_config["architecture"][len(self.layers)-1][0][1]

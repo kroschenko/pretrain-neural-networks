@@ -20,7 +20,7 @@ def get_random_seeds(count):
     return seeds
 
 
-def train_torch_model(model, loaders, optimizer, criterion, device):
+def train_torch_model(model, loaders, optimizer, criterion, device, masks=None):
     best_total_accuracy = 0
     losses = []
     train_loader = loaders["train_loader"]
@@ -43,6 +43,8 @@ def train_torch_model(model, loaders, optimizer, criterion, device):
             optimizer.step()
 
             running_loss += loss.item()
+            if masks is not None:
+                zeroing_parameters(model, masks)
         # scheduler.step()
         if epoch % Config.test_every_epochs == 0:
             current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
@@ -61,6 +63,11 @@ def train_torch_model(model, loaders, optimizer, criterion, device):
     return best_total_accuracy, losses
 
 
+def zeroing_parameters(model, masks):
+    for name, param in model.named_parameters():
+        print(name, param.size())
+
+
 def test_torch_model(model, test_loader, criterion, device):
     correct_answers = 0
     test_loss = 0
@@ -77,10 +84,11 @@ def test_torch_model(model, test_loader, criterion, device):
 def run_experiment(layers_config, pretrain_type, loaders, device, init_type, without_sampling):
     rbm_stack = RBMStack(layers_config, device, init_type, without_sampling)
     layers_losses = None
+    masks = None
     if pretrain_type != PretrainingType.Without:
         layers_losses = rbm_stack.train(loaders, pretrain_type, layer_train_type=Config.layer_train_type)
         if Config.with_reduction:
-            rbm_stack.do_reduction(layers_config)
+            masks = rbm_stack.do_reduction(layers_config)
 
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
@@ -93,6 +101,6 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     # optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     # scheduler = StepLR(optimizer, 10, 0.5)
     # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
-    best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device)
+    best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device, masks)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses
