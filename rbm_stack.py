@@ -226,6 +226,7 @@ class RBMStack:
                 print(reduction_params_percent)
                 self.rbm_stack[i].weights *= mask.double()
                 masks.append(mask)
+        return masks
             # condition = None
             # for i in range(0, len(self.layers) - 1):
             #     if condition is not None:
