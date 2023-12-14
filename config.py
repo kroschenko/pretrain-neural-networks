@@ -106,22 +106,22 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             # ], "input_dim": (1, 28, 28)},
         ],
         DatasetType.CIFAR10: [
-            {"architecture": [
-                [(3, 64, 5, False), [tanh, relu], [pooling]],
-                [(64, 32, 5, False), [relu, tanh], [pooling, add_postprocessing]],
-                [(800, 128), [tanh, relu]],
-                [(128, 10), [logsoftmax]],
-            ], "input_dim": (3, 32, 32)},
             # {"architecture": [
-            #     [(3, 32, 3, True), [tanh, relu], [bn32]],
-            #     [(32, 32, 3, True), [relu, tanh], [pooling, dropout_conv]],
-            #     [(32, 64, 3, True), [tanh, relu], [bn64]],
-            #     [(64, 64, 3, True), [relu, tanh], [pooling, dropout_conv]],
-            #     [(64, 128, 3, True), [tanh, relu], [bn128]],
-            #     [(128, 128, 3, True), [relu, tanh], [pooling, dropout_conv, add_postprocessing]],
-            #     [(2048, 512), [tanh, relu], [bn_fc, dropout]],
-            #     [(512, 10), [logsoftmax]],
+            #     [(3, 64, 5, False), [tanh, relu], [pooling]],
+            #     [(64, 32, 5, False), [relu, tanh], [pooling, add_postprocessing]],
+            #     [(800, 128), [tanh, relu]],
+            #     [(128, 10), [logsoftmax]],
             # ], "input_dim": (3, 32, 32)},
+            {"architecture": [
+                [(3, 32, 3, True), [tanh, relu], [bn32]],
+                [(32, 32, 3, True), [relu, tanh], [pooling, dropout_conv]],
+                [(32, 64, 3, True), [tanh, relu], [bn64]],
+                [(64, 64, 3, True), [relu, tanh], [pooling, dropout_conv]],
+                [(64, 128, 3, True), [tanh, relu], [bn128]],
+                [(128, 128, 3, True), [relu, tanh], [pooling, dropout_conv, add_postprocessing]],
+                [(2048, 512), [tanh, relu], [bn_fc, dropout]],
+                [(512, 10), [logsoftmax]],
+            ], "input_dim": (3, 32, 32)},
         ],
         DatasetType.CIFAR100: [
             {"architecture": [
