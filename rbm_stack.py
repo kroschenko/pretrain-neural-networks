@@ -218,7 +218,7 @@ class RBMStack:
 
     def do_reduction(self, layers_config):
         masks = []
-        coef = 1e-2
+        coef = 1e-3
         with torch.no_grad():
             for i in range(0, len(self.layers) - 1):
                 pruning_param = torch.std(self.rbm_stack[i].weights)
