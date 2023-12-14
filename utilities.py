@@ -95,6 +95,8 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
         layers_losses = rbm_stack.train(loaders, pretrain_type, layer_train_type=Config.layer_train_type)
         if with_reduction:
             masks = rbm_stack.do_reduction(layers_config)
+    else:
+        Config.max_finetuning_epochs += Config.pretraining_epochs
     # print(len(masks))
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
