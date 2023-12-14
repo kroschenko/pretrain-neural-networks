@@ -56,7 +56,7 @@ class Config:
     test_batch_size = 128
     freeze_pretrained_layers = False
     pretraining_schemes = [[PretrainingType.RBMClassic, True], [PretrainingType.Without, False]]
-    DATASETS = [DatasetType.CIFAR10]
+    DATASETS = [DatasetType.CIFAR100]
 
 
 relu = nn.ReLU()
@@ -124,12 +124,22 @@ def get_layers_config_for_dataset(experiment_dataset_name):
             ], "input_dim": (3, 32, 32)},
         ],
         DatasetType.CIFAR100: [
+            # {"architecture": [
+            #   [(3, 128, 5, False), [sigmoid, relu], [pooling]],
+            #   [(128, 64, 5, False), [relu, tanh], [pooling, add_postprocessing]],
+            #   [(1600, 1024), [tanh, relu]],
+            #   [(1024, 512), [relu, tanh]],
+            #   [(512, 100), [logsoftmax]],
+            # ], "input_dim": (3, 32, 32)},
             {"architecture": [
-              [(3, 128, 5, False), [sigmoid, relu], [pooling]],
-              [(128, 64, 5, False), [relu, tanh], [pooling, add_postprocessing]],
-              [(1600, 1024), [tanh, relu]],
-              [(1024, 512), [relu, tanh]],
-              [(512, 100), [logsoftmax]],
+                [(3, 32, 3, True), [tanh, relu]],
+                [(32, 32, 3, True), [relu, tanh], [pooling, dropout_conv]],
+                [(32, 64, 3, True), [tanh, relu]],
+                [(64, 64, 3, True), [relu, tanh], [pooling, dropout_conv]],
+                [(64, 128, 3, True), [tanh, relu]],
+                [(128, 128, 3, True), [relu, tanh], [pooling, dropout_conv, add_postprocessing]],
+                [(2048, 512), [tanh, relu], [bn_fc, dropout]],
+                [(512, 100), [logsoftmax]],
             ], "input_dim": (3, 32, 32)},
         ]
     }
