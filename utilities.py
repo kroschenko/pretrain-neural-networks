@@ -50,6 +50,7 @@ def train_torch_model(model, loaders, optimizer, criterion, device, masks=None):
             current_accuracy, test_loss = test_torch_model(model, test_loader, criterion, device)
             if current_accuracy > best_total_accuracy:
                 best_total_accuracy = current_accuracy
+            print("test loss = " + str(test_loss.item()) + " test_accuracy = " + str(current_accuracy))
         if Config.use_validation_dataset and epoch % Config.validate_every_epochs == 0:
             current_accuracy, val_loss = test_torch_model(model, val_loader, criterion, device)
             val_fail_counter = val_fail_counter + 1 if val_loss > prev_val_loss else 0
@@ -96,7 +97,10 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
         if with_reduction:
             masks = rbm_stack.do_reduction(layers_config)
     else:
-        Config.max_finetuning_epochs += Config.pretraining_epochs
+        if not with_reduction:
+            Config.max_finetuning_epochs += Config.pretraining_epochs
+        else:
+            pass
     # print(len(masks))
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
