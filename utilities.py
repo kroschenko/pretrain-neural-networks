@@ -69,7 +69,7 @@ def train_torch_model(model, loaders, optimizer, criterion, device, masks=None, 
 def get_masks_for_zeroing(model):
     masks = []
     with torch.no_grad():
-        for layer_num in range(0, len(model.layers)):
+        for layer_num in range(0, len(model.layers)-1):
             pruning_param = torch.std(model.layers[layer_num].weight)
             print(pruning_param)
             mask = torch.abs(model.layers[layer_num].weight) > pruning_param * 0.1
