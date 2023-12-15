@@ -20,7 +20,7 @@ def get_random_seeds(count):
     return seeds
 
 
-def train_torch_model(model, loaders, optimizer, criterion, device, masks=None):
+def train_torch_model(model, loaders, optimizer, criterion, device, masks=None, with_reduction=False):
     best_total_accuracy = 0
     losses = []
     train_loader = loaders["train_loader"]
@@ -61,7 +61,24 @@ def train_torch_model(model, loaders, optimizer, criterion, device, masks=None):
         print(running_loss)
         losses.append(running_loss)
         epoch += 1
+        if with_reduction and epoch == Config.reduction_after_epochs and masks is None:
+            masks = get_masks_for_zeroing(model)
     return best_total_accuracy, losses
+
+
+def get_masks_for_zeroing(model):
+    masks = []
+    with torch.no_grad():
+        for layer_num in range(0, len(model.layers)):
+            pruning_param = torch.std(model.layers[layer_num].weight)
+            print(pruning_param)
+            mask = torch.abs(model.layers[layer_num].weight) > pruning_param * 0.1
+            print(mask.shape)
+            reduction_params_percent = (~mask).sum() * 100. / mask.numel()
+            print(reduction_params_percent)
+            model.layers[layer_num].weight *= mask.double()
+            masks.append(mask)
+    return masks
 
 
 def zeroing_parameters(model, masks):
@@ -99,8 +116,6 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     else:
         if not with_reduction:
             Config.max_finetuning_epochs += Config.pretraining_epochs
-        else:
-            pass
     # print(len(masks))
     classifier = UnifiedClassifier(layers_config).to(device)
     rbm_stack.torch_model_init_from_weights(classifier)
@@ -113,6 +128,6 @@ def run_experiment(layers_config, pretrain_type, loaders, device, init_type, wit
     # optimizer = optim.Adam(classifier.parameters(), lr=Config.finetune_rate, weight_decay=1e-6)
     # scheduler = StepLR(optimizer, 10, 0.5)
     # loaders["train_loader"].dataset.transform = data_config.transform_COMMON
-    best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device, masks)
+    best_total_acc, losses = train_torch_model(classifier, loaders, optimizer, criterion, device, masks, with_reduction)
 
     return Statistics.get_train_statistics(layers_losses, best_total_acc), losses

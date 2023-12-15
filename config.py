@@ -48,6 +48,7 @@ class Config:
     # with_reduction = False
     with_adaptive_rate = False
     # reduction_param = 0.001
+    reduction_after_epochs = 10
     layer_train_type = LayerTrainType.PerLayer
     use_validation_dataset = False
     validation_split_value = 0.9
@@ -55,7 +56,9 @@ class Config:
     validation_decay = 3
     test_batch_size = 128
     freeze_pretrained_layers = False
-    pretraining_schemes = [[PretrainingType.RBMClassic, True], [PretrainingType.Without, False]]
+    pretraining_schemes = [
+        [PretrainingType.RBMClassic, True], [PretrainingType.Without, False], [PretrainingType.Without, True]
+    ]
     DATASETS = [DatasetType.CIFAR100]
 
 
